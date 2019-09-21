@@ -1,0 +1,23 @@
+{
+  "name": "serinde",
+  "version": "1.0.0",
+  "description": "Capstone project - e-commerce platform",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tholenJohn/Serinde.git"
+  },
+  "author": "Nafee, Kevin, John, Sophie, Sumiayia",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tholenJohn/Serinde/issues"
+  },
+  "homepage": "https://github.com/tholenJohn/Serinde#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
