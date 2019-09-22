@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <% include ./partials/header %>
+  <title>Serinde</title>
+</head>
+
+<body>
+    <div class="jumbotron">
+  <form action="/signup" method="POST">
+    <h1>Sign up for a new account</h1>
+    <div class="form-group">
+      <label for="email">Email address</label>
+      <input type="email" class="form-control" id="email" name="email" placeholder="Enter email">
+    </div>
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+    </div>
+    <div class="form-group">
+        <label for="password">Confirm Password</label>
+        <input type="password" class="form-control" id="confirmpassword" name="confirmpassword" placeholder="Confirm Password">
+    </div>
+    <button type="submit" class="btn btn-primary">Make Account</button>
+  </form>
+  <br>
+  <a href="/" class="btn btn-danger">Back to Login</a>
+  </div>
+  <% include ./partials/script %>
+</body>
+
+</html>
