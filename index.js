@@ -2,7 +2,15 @@
 const express = require('express')
 const app = express()
 
+
 // All local imports
+
+
+
+// EJS views setup
+app.set('view engine', 'ejs')
+app.set('views', './views')
+app.use('/public', express.static(__dirname + '/public'))
 
 
 // PORT
@@ -22,6 +30,12 @@ app.get('/', (req, res) => {
 
 
 
+//----------------------------------
+// SELLERPAGE GET ROUTE
+//----------------------------------
+app.get('/sellerprofile', (req, res) => {
+    res.render('sellerprofile')
+})
 
 
 
