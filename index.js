@@ -1,18 +1,17 @@
-const bodyParser = require('body-parser');
-const exphbs = require('express-handlebars');
-const pa = require('path');
-const nodemailer = require('nodemailer');
-const session  = require ('express-session')
-
 
 // All npm imports
 const express = require('express')
 var admin = require('firebase-admin')
 const firebase = require('firebase')
 const app = express()
+const bodyParser = require('body-parser')
+const exphbs = require('express-handlebars')
+const pa = require('path')
+const nodemailer = require('nodemailer')
+const session  = require ('express-session')
+
 
 // Firebase initialization
-
 const serviceAccount = require("./serinde-dae45-firebase-adminsdk-z0zyl-40de77fbd0.json")
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
@@ -31,30 +30,41 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 
+
+
 //All local imports
 app.set('view engine', 'handlebars'); 
 app.engine('handlebars', exphbs());
-
-
 app.set('view engine', 'ejs');
 app.set('views','./ejsviews');
-
 app.use('/public', express.static(pa.join(__dirname +'/public')));
+
 
  app.use(bodyParser.urlencoded({ extended: false }));
  app.use(bodyParser.json());
 
-// app.use(express.urlencoded( {extended:false}));
-// PORT
+
+//----------------------------------
+// PORT ROUTE
+//----------------------------------
 const PORT = process.env.PORT || 3000
 
 app.listen(PORT, () => {
     console.log(`Server is running at port ${PORT}`)
 })
 
+
+//----------------------------------
+// LOGIN PAGE GET ROUTE
+//----------------------------------
 app.get('/login', (req,res)=>{
   res.render("login")
 })
+
+
+//----------------------------------
+// LOGIN PAGE POST ROUTE
+//----------------------------------
 app.post('/login', (req, res) => {
   const email = req.body.email
   const password = req.body.password
@@ -71,9 +81,18 @@ app.post('/login', (req, res) => {
       })
 })
 
+
+//----------------------------------
+// SIGNUP PAGE GET ROUTE
+//----------------------------------
 app.get('/signup', (req, res) => {
   res.render('signup')
 })
+
+
+//----------------------------------
+// SIGNUP PAGE POST ROUTE
+//----------------------------------
 app.post('/signup', (req, res) => {
   const email = req.body.email
   const password = req.body.password
@@ -94,10 +113,20 @@ app.post('/signup', (req, res) => {
 })
 
 
+//----------------------------------
+// SELLERPAGE GET ROUTE
+//----------------------------------
+app.get('/sellerprofile', (req, res) => {
+    res.render('sellerprofile')
+})
+
+
+
+//----------------------------------
+// HOMEPAGE GET ROUTE
+//----------------------------------
 app.get('/', (_req,res) => {
   res.render('storefront',{nav: 'storefront'});
-
-  
 
 app.get('/contact', (req, res) => {
     res.render('main.handlebars',{nav: 'contact'});
