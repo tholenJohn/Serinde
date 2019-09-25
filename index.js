@@ -5,7 +5,7 @@ const firebase = require('firebase')
 const app = express()
 app.use(express.urlencoded({ extended: false }))
 app.set('view engine', 'ejs')
-app.set('views', './views')
+app.set('views', './ejsviews')
 app.use('/public', express.static(__dirname + '/public'))
 
 // Firebase initialization
