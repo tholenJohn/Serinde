@@ -9,7 +9,22 @@
          
             <li class="nav-item <%= nav == 'contact' ? 'active' : ''%>">
               <a class="nav-link" href="/contact">Contact Us</a>
-            </li>
+			</li>
+			<li class="login">
+				<a class="btn btn-primary" href="/login" role="button">Login</a>
+			</li>
+			<li class="dropdown">
+				<div class="dropdown">
+					<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					  Dropdown button
+					</button>
+					<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+					  <a class="dropdown-item" href="/">Action</a>
+					  <a class="dropdown-item" href="/">Another action</a>
+					  <a class="dropdown-item" href="/">Something else here</a>
+					</div>
+				  </div>
+			</li>
           </ul>
         </div>
       </nav>
