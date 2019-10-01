@@ -18,6 +18,7 @@ admin.initializeApp({
     databaseURL: "https://serinde-dae45.firebaseio.com"
   });
 const db = admin.firestore();
+const sellers = db.collection('Sellers')
 
 const firebaseConfig = {
     apiKey: "AIzaSyDFSmXBXK2k_QUsWRu6NJrGhc7AcAEW5ZU",
@@ -112,15 +113,81 @@ app.post('/signup', (req, res) => {
   }
 })
 
-
 //----------------------------------
 // SELLERPAGE GET ROUTE
 //----------------------------------
 app.get('/sellerprofile', (req, res) => {
-    res.render('sellerprofile')
+  res.render('sellerprofile')
 })
 
 
+
+//----------------------------------
+// USERPAGE GET ROUTE
+//----------------------------------
+//TODO seller with id for specific seller
+app.get('/userprofile', (req, res) => {
+    //get info of a seller
+    const sellerid = "GGoWWB8HPBaTMJw4eGU3"
+    sellers.doc(sellerid).get()
+           .then(seller => {
+             res.render('userprofile', {
+               seller
+             })
+           })
+           .catch(error => {
+             res.render('errorpage')
+           })
+})
+
+app.post('/updateuserprofile', (req, res) => {
+
+  const sellerid = "GGoWWB8HPBaTMJw4eGU3";
+  const Email = req.body.email;
+  const FirstName = req.body.firstName;
+  const LastName = req.body.lastName;
+  const ProfilePicUrl = ""
+  
+  sellers.doc(sellerid).set({FirstName, LastName, Email, ProfilePicUrl})
+  .then(result => {
+    res.redirect('/userprofile')
+  })
+  .catch(error => {
+    res.render('errorpage')
+  })   
+
+})
+
+/*
+app.post('/admin/insert', (req, res) => {
+
+  imageUpload(req, res, error => {
+      if(error){
+          return res.render('admin/errorPage', {message: error})
+      }else if(!req.file){
+          return res.render('admin/errorPage', {message: 'No file selected'});
+      }
+
+      const productTitle = req.body.title;
+      const productPrice = req.body.price;
+      const productDescription = req.body.description;
+      const productImage = req.file.filename;
+      
+            
+      products.doc().set({productTitle, productImage, productPrice, productDescription})
+      .then(result => {
+          res.redirect('/admin/dashboard-products')
+      })
+      .catch(error => {
+          res.render('errorPage', {
+              source: '/admin/insert',
+              error
+          });
+      })
+  })
+})
+
+*/
 
 //----------------------------------
 // HOMEPAGE GET ROUTE
