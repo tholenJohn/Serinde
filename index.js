@@ -193,8 +193,9 @@ app.post('/admin/insert', (req, res) => {
 // HOMEPAGE GET ROUTE
 //----------------------------------
 app.get('/', (_req,res) => {
-  res.render('storefront',{nav: 'storefront'});
-
+  if(firebase.auth().currentUser)
+    res.render('storefront',{nav: 'storefront', email: firebase.auth().currentUser.email, login: true});
+  else res.render('storefront',{nav: 'storefront', email: '', login: false});
 app.get('/contact', (req, res) => {
     res.render('main.handlebars',{nav: 'contact'});
   });
@@ -254,3 +255,16 @@ app.get('/contact', (req, res) => {
     //NODEMAILER CONFIG. ENDS
     //==========================================================
   })
+//==========================================================
+//logout 
+//==========================================================
+app.get('/logout', (req, res) => {
+  firebase.auth().signOut()
+  .then (result => {
+    res.send(error)
+  })
+  .catch(error => {
+    res.send(error)
+  })
+  res.render('storefront',{nav: 'storefront', email: '', login: false});
+})
