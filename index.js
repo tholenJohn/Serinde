@@ -266,4 +266,5 @@ app.get('/logout', (req, res) => {
   .catch(error => {
     res.send(error)
   })
+  res.render('storefront',{nav: 'storefront', email: '', login: false});
 })
