@@ -113,6 +113,33 @@ app.post('/signup', (req, res) => {
   }
 })
 
+
+//----------------------------------
+// RESET PASSWORD PAGE GET ROUTE
+//----------------------------------
+app.get('/resetpassword', (req, res) => {
+    res.render('resetpassword')
+})
+
+
+//----------------------------------
+// RESET PASSWORD PAGE POST ROUTE
+//----------------------------------
+app.post('/resetpassword', (req, res) => {
+    const email = req.body.email
+    const auth = firebase.auth()
+
+    if(email != "") {
+        auth.sendPasswordResetEmail(email)
+                .then(result => {
+                    res.redirect('/login')
+                })
+    } else {
+        res.render('errorPage', { message: "Enter a valid email" })
+    }
+})
+
+
 //----------------------------------
 // SELLERPAGE GET ROUTE
 //----------------------------------
@@ -158,6 +185,9 @@ app.post('/updateuserprofile', auth,(req, res) => {
 
 })
 
+
+
+
 /*
 app.post('/admin/insert', (req, res) => {
 
@@ -199,6 +229,7 @@ app.get('/', (_req,res) => {
 app.get('/contact', (req, res) => {
     res.render('main.handlebars',{nav: 'contact'});
   });
+
   //==========================================================
   //nodemailer configuration starts..
   //==========================================================
