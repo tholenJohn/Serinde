@@ -113,10 +113,37 @@ app.post('/signup', (req, res) => {
   }
 })
 
+
+//----------------------------------
+// RESET PASSWORD PAGE GET ROUTE
+//----------------------------------
+app.get('/resetpassword', (req, res) => {
+    res.render('resetpassword')
+})
+
+
+//----------------------------------
+// RESET PASSWORD PAGE POST ROUTE
+//----------------------------------
+app.post('/resetpassword', (req, res) => {
+    const email = req.body.email
+    const auth = firebase.auth()
+
+    if(email != "") {
+        auth.sendPasswordResetEmail(email)
+                .then(result => {
+                    res.redirect('/login')
+                })
+    } else {
+        res.render('errorPage', { message: "Enter a valid email" })
+    }
+})
+
+
 //----------------------------------
 // SELLERPAGE GET ROUTE
 //----------------------------------
-app.get('/sellerprofile', (req, res) => {
+app.get('/sellerprofile', auth,(req, res) => {
   res.render('sellerprofile')
 })
 
@@ -126,7 +153,7 @@ app.get('/sellerprofile', (req, res) => {
 // USERPAGE GET ROUTE
 //----------------------------------
 //TODO seller with id for specific seller
-app.get('/userprofile', (req, res) => {
+app.get('/userprofile', auth,(req, res) => {
     //get info of a seller
     const sellerid = "GGoWWB8HPBaTMJw4eGU3"
     sellers.doc(sellerid).get()
@@ -140,7 +167,7 @@ app.get('/userprofile', (req, res) => {
            })
 })
 
-app.post('/updateuserprofile', (req, res) => {
+app.post('/updateuserprofile', auth,(req, res) => {
 
   const sellerid = "GGoWWB8HPBaTMJw4eGU3";
   const Email = req.body.email;
@@ -157,6 +184,9 @@ app.post('/updateuserprofile', (req, res) => {
   })   
 
 })
+
+
+
 
 /*
 app.post('/admin/insert', (req, res) => {
@@ -199,6 +229,7 @@ app.get('/', (_req,res) => {
 app.get('/contact', (req, res) => {
     res.render('main.handlebars',{nav: 'contact'});
   });
+
   //==========================================================
   //nodemailer configuration starts..
   //==========================================================
@@ -261,10 +292,30 @@ app.get('/contact', (req, res) => {
 app.get('/logout', (req, res) => {
   firebase.auth().signOut()
   .then (result => {
-    res.send(error)
+    res.render('storefront',{nav: 'storefront', email: '', login: false});
   })
   .catch(error => {
     res.send(error)
   })
-  res.render('storefront',{nav: 'storefront', email: '', login: false});
 })
+
+//auth functions
+function auth(req, res, next) {
+  if (firebase.auth().currentUser) {
+      next()
+  } else {
+      res.render('errorPage', { message: "Unauthorized access! Login to access this page." })
+  }
+}
+
+function adminAuth(req, res, next) {
+  if (firebase.auth().currentUser && isAdmin(firebase.auth().currentUser.email)) {
+      next()
+  } else {
+      res.render('errorPage', { message: "Unauthorized access! Privileged users only." })
+  }
+}
+
+function isAdmin(email) {
+  return email == "khoffmeister1@uco.edu" // || email == ""
+}
