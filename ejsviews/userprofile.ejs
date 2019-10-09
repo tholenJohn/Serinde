@@ -18,14 +18,20 @@
     <div class="col-md-4">      
         <div class="portlet light profile-sidebar-portlet bordered">
             <div class="profile-userpic">
-                <img src="https://bootdey.com/img/Content/avatar/avatar6.png" class="img-responsive" alt=""> </div>
+                <img src="https://bootdey.com/img/Content/avatar/avatar6.png" class="img-responsive" alt=""> </div> <!-- needs to be dynamic to user's profile pic -->
             <div class="profile-usertitle">
-                <div class="profile-usertitle-name"> <%= seller.data().FirstName %> </div>
+                <div class="profile-usertitle-name">  </div>
                 <div class="profile-usertitle-job"> User </div>
-                <div class="profile-useretite-email"> <%= seller.data().Email %></div>
+                <div class="profile-useretite-email"> </div>
             </div>
             <div class="profile-userbuttons">
                 <a href="/resetpassword" class="btn btn-primary">Reset Password</a>
+            </div>
+            <div class="profile-userbuttons">
+                <a href="/changeemail" class="btn btn-primary">Change Email</a>
+            </div>
+            <div class="profile-userbuttons">
+                <a href="/" class="btn btn-danger">Back</a>
             </div>
           
         </div>
@@ -55,16 +61,21 @@
                         <div role="tabpanel" class="tab-pane" id="update">
                                 <form action='/updateuserprofile' method="POST">
                                   <div class="form-group">
-                                    <label for="inputName">Name</label>
-                                    <input type="text" name="firstName" class="form-control" id="inputName" placeholder="<%= seller.data().FirstName %>" >
+                                    <label for="inputName">First Name</label>
+                                    <input type="text" name="firstName" class="form-control" id="inputName" placeholder="<%=data.FirstName%>" >
                                   </div>
                                     <div class="form-group">
                                     <label for="inputLastName">Last Name</label>
-                                    <input type="text" name="lastName" class="form-control" id="inputLastName" placeholder="<%= seller.data().LastName %>" >
+                                    <input type="text" name="lastName" class="form-control" id="inputLastName" placeholder="<%=data.LastName%>" >
                                   </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputLocation">Location</label>
+                                    <input type="text" name="location" class="form-control" id="location" placeholder="<%=data.Location%>" >
+                                 </div>
                                   <div class="form-group">
                                     <label for="exampleInputEmail1">Email address</label>
-                                    <input type="email" name="email" class="form-control" id="exampleInputEmail1" placeholder="<%= seller.data().Email %>" >
+                                    <input type="text" readonly name="email" class="form-control" id="exampleInputEmail1" placeholder="<%=data.Email%>" >
                                   </div>
                                   <div class="form-group">
                                     <label for="exampleInputFile">Profile Pic</label>
