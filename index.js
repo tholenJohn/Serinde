@@ -18,6 +18,7 @@ admin.initializeApp({
     databaseURL: "https://serinde-dae45.firebaseio.com"
   });
 const db = admin.firestore();
+const sellers = db.collection('Sellers')
 
 const firebaseConfig = {
     apiKey: "AIzaSyDFSmXBXK2k_QUsWRu6NJrGhc7AcAEW5ZU",
@@ -114,23 +115,121 @@ app.post('/signup', (req, res) => {
 
 
 //----------------------------------
+// RESET PASSWORD PAGE GET ROUTE
+//----------------------------------
+app.get('/resetpassword', (req, res) => {
+    res.render('resetpassword')
+})
+
+
+//----------------------------------
+// RESET PASSWORD PAGE POST ROUTE
+//----------------------------------
+app.post('/resetpassword', (req, res) => {
+    const email = req.body.email
+    const auth = firebase.auth()
+
+    if(email != "") {
+        auth.sendPasswordResetEmail(email)
+                .then(result => {
+                    res.redirect('/login')
+                })
+    } else {
+        res.render('errorPage', { message: "Enter a valid email" })
+    }
+})
+
+
+//----------------------------------
 // SELLERPAGE GET ROUTE
 //----------------------------------
-app.get('/sellerprofile', (req, res) => {
-    res.render('sellerprofile')
+app.get('/sellerprofile', auth,(req, res) => {
+  res.render('sellerprofile')
 })
 
 
 
 //----------------------------------
+// USERPAGE GET ROUTE
+//----------------------------------
+//TODO seller with id for specific seller
+app.get('/userprofile', auth,(req, res) => {
+    //get info of a seller
+    const sellerid = "GGoWWB8HPBaTMJw4eGU3"
+    sellers.doc(sellerid).get()
+           .then(seller => {
+             res.render('userprofile', {
+               seller
+             })
+           })
+           .catch(error => {
+             res.render('errorpage')
+           })
+})
+
+app.post('/updateuserprofile', auth,(req, res) => {
+
+  const sellerid = "GGoWWB8HPBaTMJw4eGU3";
+  const Email = req.body.email;
+  const FirstName = req.body.firstName;
+  const LastName = req.body.lastName;
+  const ProfilePicUrl = ""
+  
+  sellers.doc(sellerid).set({FirstName, LastName, Email, ProfilePicUrl})
+  .then(result => {
+    res.redirect('/userprofile')
+  })
+  .catch(error => {
+    res.render('errorpage')
+  })   
+
+})
+
+
+
+
+/*
+app.post('/admin/insert', (req, res) => {
+
+  imageUpload(req, res, error => {
+      if(error){
+          return res.render('admin/errorPage', {message: error})
+      }else if(!req.file){
+          return res.render('admin/errorPage', {message: 'No file selected'});
+      }
+
+      const productTitle = req.body.title;
+      const productPrice = req.body.price;
+      const productDescription = req.body.description;
+      const productImage = req.file.filename;
+      
+            
+      products.doc().set({productTitle, productImage, productPrice, productDescription})
+      .then(result => {
+          res.redirect('/admin/dashboard-products')
+      })
+      .catch(error => {
+          res.render('errorPage', {
+              source: '/admin/insert',
+              error
+          });
+      })
+  })
+})
+
+*/
+
+//----------------------------------
 // HOMEPAGE GET ROUTE
 //----------------------------------
 app.get('/', (_req,res) => {
-  res.render('storefront',{nav: 'storefront'});
-
+  if(firebase.auth().currentUser)
+    res.render('storefront',{nav: 'storefront', email: firebase.auth().currentUser.email, login: true});
+  else res.render('storefront',{nav: 'storefront', email: '', login: false});
 app.get('/contact', (req, res) => {
     res.render('main.handlebars',{nav: 'contact'});
   });
+
   //==========================================================
   //nodemailer configuration starts..
   //==========================================================
@@ -187,3 +286,36 @@ app.get('/contact', (req, res) => {
     //NODEMAILER CONFIG. ENDS
     //==========================================================
   })
+//==========================================================
+//logout 
+//==========================================================
+app.get('/logout', (req, res) => {
+  firebase.auth().signOut()
+  .then (result => {
+    res.render('storefront',{nav: 'storefront', email: '', login: false});
+  })
+  .catch(error => {
+    res.send(error)
+  })
+})
+
+//auth functions
+function auth(req, res, next) {
+  if (firebase.auth().currentUser) {
+      next()
+  } else {
+      res.render('errorPage', { message: "Unauthorized access! Login to access this page." })
+  }
+}
+
+function adminAuth(req, res, next) {
+  if (firebase.auth().currentUser && isAdmin(firebase.auth().currentUser.email)) {
+      next()
+  } else {
+      res.render('errorPage', { message: "Unauthorized access! Privileged users only." })
+  }
+}
+
+function isAdmin(email) {
+  return email == "khoffmeister1@uco.edu" // || email == ""
+}
