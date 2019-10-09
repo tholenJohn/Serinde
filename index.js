@@ -74,7 +74,6 @@ app.get('/changeemail', auth, (req,res)=>{
 // CHANGE EMAIL POST ROUTE
 //----------------------------------
 app.post('/changeemail',auth,(req,res)=>{
-  // send reset email confirmation through firebase
   const oldEmail = firebase.auth().currentUser.email
   const userEmail = req.body.email
     firebase.auth().currentUser.updateEmail(userEmail)
@@ -87,11 +86,17 @@ app.post('/changeemail',auth,(req,res)=>{
                                           FirstName : data.FirstName, 
                                           LastName: data.FirstName, 
                                           Location: data.Location, 
-                                          ProfilePicUrl: data.ProfilePicUrl})// creating another doc with the same data
-                users.doc(oldEmail).delete() // deleting old email document
+                                          ProfilePicUrl: data.ProfilePicUrl})
+                    .then(result=>{
+                        users.doc(oldEmail).delete() // deleting old email document
+                        users.doc(userEmail).get().then(doc=>{ // getting new information to send to profile
+                        data = doc.data()
+                        res.render('userprofile', {data})
+                      })
+                  })// creating another doc with the same data
+                
               }
             })
-            res.render('userprofile', { email: firebase.auth().currentUser.email })
         })
         .catch(error => {
             res.render('errorPage', { message: error.message })
@@ -206,7 +211,7 @@ app.get('/sellerprofile', auth,(req, res) => {
 // USERPAGE GET ROUTE
 //----------------------------------
 //TODO seller with id for specific seller
-app.get('/userprofile', auth,(req, res) => {
+app.get('/userprofile', auth, (req, res) => {
     const userEmail = firebase.auth().currentUser.email
     users.doc(userEmail).get().then(doc=>{
       var data = doc.data()
