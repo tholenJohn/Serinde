@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <% include ../partials/header %>
+  <title>Change Email</title>
+</head>
+
+<body>
+    <div class="jumbotron">
+  <form action="/changeemail" method="POST">
+    <h1>Change email address</h1>
+    <div class="form-group">
+      <input type="email" class="form-control" id="email" name="email" placeholder="Enter new email">
+    </div>
+    <br>
+    You will recieve and email that your login email has changed.
+    <br>
+    <button type="submit" class="btn btn-primary">Update</button>
+  </form>
+  <br>
+  <a href="/userprofile" class="btn btn-danger">Back to Profile</a>
+  </div>
+  <% include ../partials/scripts %>
+</body>
+
+</html>

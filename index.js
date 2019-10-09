@@ -19,6 +19,7 @@ admin.initializeApp({
   });
 const db = admin.firestore();
 const sellers = db.collection('Sellers')
+const users = db.collection('users')
 
 const firebaseConfig = {
     apiKey: "AIzaSyDFSmXBXK2k_QUsWRu6NJrGhc7AcAEW5ZU",
@@ -62,6 +63,41 @@ app.get('/login', (req,res)=>{
   res.render("login")
 })
 
+//----------------------------------
+// CHANGE EMAIL PAGE GET ROUTE
+//----------------------------------
+app.get('/changeemail', auth, (req,res)=>{
+  res.render("changeemail")
+})
+
+//----------------------------------
+// CHANGE EMAIL POST ROUTE
+//----------------------------------
+app.post('/changeemail',auth,(req,res)=>{
+  // send reset email confirmation through firebase
+  const oldEmail = firebase.auth().currentUser.email
+  const userEmail = req.body.email
+    firebase.auth().currentUser.updateEmail(userEmail)
+        .then(result => {
+          // update user collection where it is their old email and update the entry
+            users.doc(oldEmail).get().then(oldDoc=>{
+              if(oldDoc && oldDoc.exists){
+                var data = oldDoc.data()
+                users.doc(userEmail).set({Email: userEmail, 
+                                          FirstName : data.FirstName, 
+                                          LastName: data.FirstName, 
+                                          Location: data.Location, 
+                                          ProfilePicUrl: data.ProfilePicUrl})// creating another doc with the same data
+                users.doc(oldEmail).delete() // deleting old email document
+              }
+            })
+            res.render('userprofile', { email: firebase.auth().currentUser.email })
+        })
+        .catch(error => {
+            res.render('errorPage', { message: error.message })
+        })
+  
+})
 
 //----------------------------------
 // LOGIN PAGE POST ROUTE
@@ -98,15 +134,32 @@ app.post('/signup', (req, res) => {
   const email = req.body.email
   const password = req.body.password
   const confirmpassword = req.body.confirmpassword
+  const first = req.body.first
+  const last = req.body.last
+  const location = req.body.location
   if (password == confirmpassword) {
       //signup
       firebase.auth().createUserWithEmailAndPassword(email, password)
           .then(result => {
-              res.render('login')
+              //creating new document for the new user
+              users.doc(email).set({FirstName: first, LastName: last, Location:location, Email: email, ProfilePicUrl:""})
+                      .then(result => {
+                        //signing in and redirecting to storefront with new account
+                        firebase.auth().signInWithEmailAndPassword(email, password)
+                        .then(result => {
+                            res.redirect('/') // to homepage
+                        })
+                        .catch(error => {
+                            res.render('errorPage', { message: error.message })
+                        })
+                   })
+                  .catch(error => {
+                    res.render('errorpage', {message : error.message})
+                   })  
           })
           .catch(error => {
               res.render('errorPage', { message: error.message })
-          })
+          }) 
   }
   else {
       res.render('errorPage', { message: "The passwords do not match." })
@@ -154,17 +207,11 @@ app.get('/sellerprofile', auth,(req, res) => {
 //----------------------------------
 //TODO seller with id for specific seller
 app.get('/userprofile', auth,(req, res) => {
-    //get info of a seller
-    const sellerid = "GGoWWB8HPBaTMJw4eGU3"
-    sellers.doc(sellerid).get()
-           .then(seller => {
-             res.render('userprofile', {
-               seller
-             })
-           })
-           .catch(error => {
-             res.render('errorpage')
-           })
+    const userEmail = firebase.auth().currentUser.email
+    users.doc(userEmail).get().then(doc=>{
+      var data = doc.data()
+      res.render('userprofile', {data})
+    })
 })
 
 app.post('/updateuserprofile', auth,(req, res) => {
@@ -180,7 +227,7 @@ app.post('/updateuserprofile', auth,(req, res) => {
     res.redirect('/userprofile')
   })
   .catch(error => {
-    res.render('errorpage')
+    res.render('errorpage',{message : error.message})
   })   
 
 })
