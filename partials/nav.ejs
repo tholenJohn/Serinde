@@ -1,33 +1,93 @@
+<script src="//cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js"></script>
+<script src="//cdn.jsdelivr.net/autocomplete.js/0/autocomplete.min.js"></script>
+
+<link rel="stylesheet" href="../public/css/nav.css">
+
+
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="/">Serinde</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav">
-             
-         
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+					  <span class="navbar-toggler-icon"></span>
+                    </button>
+
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+
+        <ul class="navbar-nav">
+
+            <a class="navbar-brand" href="/">Serinde</a>
+
+            <nav class="navbar navbar-light bg-light">
+
+                <!-- Search Bar-->
+
+                <form class="form-inline">
+                    <input class="form-control mr-lg-10" type="search" placeholder="Search..." aria-label="Search" size="75">
+                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                </form>
+
+            </nav>
+
+            <!-- Contact Us-->
+
             <li class="nav-item <%= nav == 'contact' ? 'active' : ''%>">
-              <a class="nav-link" href="/contact">Contact Us</a>
-			</li>
-			<% if (!login) { %>
-			<li class="login">
-				<a class="btn btn-primary" href="/login" role="button">Login</a>
-			</li>
-			<% } else { %>
-			<li class="dropdown">
-				<div class="dropdown">
-					<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-					<%= email %>  
-					</button>
-					<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-					  <a class="dropdown-item" href="/userprofile">User Profile</a>
-					  <a class="dropdown-item" href="/sellerprofile">Selling information</a>
-					  <a class="dropdown-item" href="/logout">Log out</a>
-					</div>
-				  </div>
-			</li>
-			<% } %>
-          </ul>
-        </div>
-      </nav>
+                <a class="nav-link" href="/contact">Contact Us</a>
+            </li>
+            <% if (!login) { %>
+                <li class="login">
+                    <a class="btn btn-primary" href="/login" role="button">Login</a>
+                </li>
+                <% } else { %>
+                    <li class="dropdown">
+                        <div class="dropdown">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+								<%= email %>  
+								</button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <a class="dropdown-item" href="/userprofile">User Profile</a>
+                                <a class="dropdown-item" href="/sellerprofile">Selling information</a>
+                                <a class="dropdown-item" href="/logout">Log out</a>
+                            </div>
+                        </div>
+                    </li>
+                    <% } %>
+        </ul>
+
+    </div>
+
+
+</nav>
+
+
+<div class="dropdown">
+    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+		  Categories
+	</button>
+
+    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <a class="dropdown-item" href="#">Fashion</a>
+        <ul>
+            <li><a href="/Men">Men</a></li>
+            <li><a href="/Women">Women</a></li>
+            <li><a href="/Children">Children</a></li>
+        </ul>
+
+        <a class="dropdown-item" href="#">Beauty</a>
+        <ul>
+            <li><a href="/SkinCare">Skin care</a></li>
+            <li><a href="/HairCare">Hair Care</a></li>
+            <li><a href="/Cosmetics">Cosmetics</a></li>
+        </ul>
+
+        <a class="dropdown-item" href="#">Electronics</a>
+        <ul>
+            <li><a href="/ComputersAndTablets">Computers & Tablets</a></li>
+            <li><a href="/TVAndAudio">TV & Audio</a></li>
+            <li><a href="/CellPhonesAndAccessories">Cell phones & Accessories</a></li>
+        </ul>
+
+        <li><a href="/Clearance">Clearance</a></li>
+
+
+    </div>
+</div>
