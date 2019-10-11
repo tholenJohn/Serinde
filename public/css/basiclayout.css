@@ -4,8 +4,8 @@
     background-color: aqua;
 } 
 
-.seller_profile {
-    margin-top: 20px;
+.left_column {
+    padding-top: 20px;
     height: 95vh;
 }
 
@@ -46,4 +46,18 @@ p .seller_paragraph_text {
 
 .circle_photo {
     border-radius: 50%;
+}
+
+/* ----------------------------------------------
+USED IN STOREFRONT PAGE
+   ----------------------------------------------
+*/ 
+
+h3 {
+    width: 100%;
+    height: 40px;
+}
+
+.card_row {
+    height: 200px;
 }
