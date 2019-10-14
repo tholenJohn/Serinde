@@ -229,7 +229,7 @@ const imageUpload = multer( {
         if(ext && mimetype){
             return callback(null, true)
         }else{
-            return callback('Error: Images (jpeg, jpg, png, git) only');
+            return callback('Error: Images (jpeg, jpg, png, gif) only');
         }
     }
 }).single('file_source');
@@ -278,24 +278,52 @@ app.get('/sellerprofile/productupdate', (req, res) => {
                     })
                 })
                 .catch(error => {
-                    res.render('errorPage', {
-                        source: '',
-                        error
-                    })
+                    res.render('errorPage', 
+                      {message: error}
+                    )
                 })   
           })
           .catch(error => {
-            //
+            res.render('errorPage', 
+                      {message: error}
+                    )
           })
-
 })
 
 app.post('/sellerprofile/productupdate', (req, res) => {
+
+  imageUpload(req, res, error => {
+    if(error){
+        return res.render('errorpage', {message: error})
+    }else if(!req.file){
+      //return res.render('errorpage', {message: "File not found!"})
+      const productId = req.body.id;
+      let data = {
+        ProductCategory : req.body.category,
+        ProductDescription : req.body.description,
+        ProductImage : req.body.productImage,
+        ProductPrice : req.body.price,
+        ProductTitle : req.body.title,
+        SellerId : 'I07Uu1R0nUrYs3obRE1B'
+      }
+          
+      productsCollection.doc(productId).set(data)
+      .then(result => {
+          res.redirect('/sellerprofile')
+      })
+      .catch(error => {
+          res.render('errorPage', {
+              source: '/sellerprofile#products',
+              error
+          });
+      })
+    }else{
+
   const productId = req.body.id;
   let data = {
     ProductCategory : req.body.category,
     ProductDescription : req.body.description,
-    ProductImage : req.body.productImage,
+    ProductImage : req.file.filename,
     ProductPrice : req.body.price,
     ProductTitle : req.body.title,
     SellerId : 'I07Uu1R0nUrYs3obRE1B'
@@ -307,11 +335,12 @@ app.post('/sellerprofile/productupdate', (req, res) => {
   })
   .catch(error => {
       res.render('errorPage', {
-          source: '/sellerprofile',
+          source: '/sellerprofile#products',
           error
       });
   })
-
+ }
+ })
 })
 
 app.post('/sellerprofile/productadd', (req, res) => {
