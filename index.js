@@ -9,7 +9,8 @@ const exphbs = require('express-handlebars')
 const pa = require('path')
 const nodemailer = require('nodemailer')
 const session  = require ('express-session')
-
+const fs = require('fs')
+const utils = require('./utils.js')
 
 // Firebase initialization
 const serviceAccount = require("./serinde-dae45-firebase-adminsdk-z0zyl-40de77fbd0.json")
@@ -18,8 +19,9 @@ admin.initializeApp({
     databaseURL: "https://serinde-dae45.firebaseio.com"
   });
 const db = admin.firestore();
-const sellers = db.collection('Sellers')
+const sellers = db.collection('sellers')
 const users = db.collection('users')
+const productsCollection = db.collection('products')
 
 const firebaseConfig = {
     apiKey: "AIzaSyDFSmXBXK2k_QUsWRu6NJrGhc7AcAEW5ZU",
@@ -201,18 +203,190 @@ app.post('/resetpassword', (req, res) => {
 //----------------------------------
 // SELLERPAGE GET ROUTE
 //----------------------------------
-app.get('/sellerprofile', auth,(req, res) => {
-  res.render('sellerprofile')
+
+const multer = require('multer');
+const path = require('path');
+
+const MAX_FILESIZE = 1020 * 1000 // 1000 kb
+const fileTypes = /jpeg|jpg|png|gif/;
+
+const storageOptions = multer.diskStorage({
+    destination: (req, file, callback) => {
+        callback(null, './public/images');
+    },
+    filename: (req, file, callback) => {
+        callback(null, 'image'+Date.now()+path.extname(file.originalname))
+    }
 })
 
+const imageUpload = multer( {
+    storage: storageOptions,
+    limits: {fileSize: MAX_FILESIZE},
+    fileFilter: (req, file, callback) => {
+        const ext = fileTypes.test(path.extname(file.originalname).toLowerCase());
+        const mimetype = fileTypes.test(file.mimetype);
+
+        if(ext && mimetype){
+            return callback(null, true)
+        }else{
+            return callback('Error: Images (jpeg, jpg, png, git) only');
+        }
+    }
+}).single('file_source');
+
+//Lifting auth for easy testing
+app.get('/sellerprofile' /*, auth*/,(req, res) => {
+  //get products, seller info 
+
+
+  var products = []
+  var seller
+
+  sellers.doc('I07Uu1R0nUrYs3obRE1B').get()
+         .then(sellerSnap => {
+            seller = sellerSnap
+            productsCollection.get().then(productSnap => {
+              productSnap.forEach(product => { 
+                products.push(product)
+              })
+             //setTimeout(() => {console.log(products)}, 3000)
+             res.render('sellerprofile', {products, seller, utils, source: 'sellerprofile'})
+            })
+
+         })
+         .catch(error => {
+           //
+         })
+
+})
+
+app.get('/sellerprofile/productupdate', (req, res) => {
+  const _id = req.query._id;
+
+  var seller
+
+  sellers.doc('I07Uu1R0nUrYs3obRE1B').get()
+         .then(sellerSnap => {
+            seller = sellerSnap
+            productsCollection.doc(_id).get()
+                .then(product => {
+                    res.render('sellerprofile', {
+                        product,
+                        utils,
+                        seller,
+                        source: 'sellerproductUpdate'
+                    })
+                })
+                .catch(error => {
+                    res.render('errorPage', {
+                        source: '',
+                        error
+                    })
+                })   
+          })
+          .catch(error => {
+            //
+          })
+
+})
+
+app.post('/sellerprofile/productupdate', (req, res) => {
+  const productId = req.body.id;
+  let data = {
+    ProductCategory : req.body.category,
+    ProductDescription : req.body.description,
+    ProductImage : req.body.productImage,
+    ProductPrice : req.body.price,
+    ProductTitle : req.body.title,
+    SellerId : 'I07Uu1R0nUrYs3obRE1B'
+  }
+      
+  productsCollection.doc(productId).set(data)
+  .then(result => {
+      res.redirect('/sellerprofile')
+  })
+  .catch(error => {
+      res.render('errorPage', {
+          source: '/sellerprofile',
+          error
+      });
+  })
+
+})
+
+app.post('/sellerprofile/productadd', (req, res) => {
+
+  imageUpload(req, res, error => {
+    if(error){
+        return res.render('errorpage', {message: error})
+    }else if(!req.file){
+        return res.render('errorpage', {message: 'No file selected'});
+    }
+
+    let data = {
+      ProductCategory : req.body.category,
+      ProductDescription : req.body.description,
+      ProductImage : req.file.filename,
+      ProductPrice : req.body.price,
+      ProductTitle : req.body.title,
+      SellerId : 'I07Uu1R0nUrYs3obRE1B'
+    }
+        
+    productsCollection.doc().set(data)
+    .then(result => {
+        res.redirect('/sellerprofile')
+    })
+    .catch(error => {
+        res.render('errorPage', {
+            source: '/sellerprofile#products',
+            error
+        });
+    })
+  })
+})
+
+app.post('/sellerprofile/productdelete', (req, res) => {
+  const productId = req.body.id;  //productId 
+  
+  //get imagefilename 
+  productsCollection.doc(productId).get()
+      .then(doc => {
+          if(doc.exists){
+              imagefilename = doc.data().ProductImage;
+              fs.unlink('./public/images/' + imagefilename, (error) => {
+                  if(error){
+                      res.render('errorpage', {message: 'fs.unlink error to delete image file'})
+                  }
+              })
+          }
+      })
+      .catch(error => {
+          res.render('errorpage', {
+              source: 'sellerprofile#product',
+              error
+          })
+      })
+  //delete from firebase
+  productsCollection.doc(productId).delete()
+      .then(result => {
+          res.redirect('/sellerprofile')
+      })
+      .catch(error => {
+          res.render('errorpage', {
+              source: 'sellerprofile#product',
+              error
+          })
+      });
+})
 
 
 //----------------------------------
 // USERPAGE GET ROUTE
 //----------------------------------
 //TODO seller with id for specific seller
-app.get('/userprofile', auth, (req, res) => {
+app.get('/userprofile', (req, res) => {
     const userEmail = firebase.auth().currentUser.email
+    console.log(userEmail)
     users.doc(userEmail).get().then(doc=>{
       var data = doc.data()
       res.render('userprofile', {data})
@@ -238,38 +412,6 @@ app.post('/updateuserprofile', auth,(req, res) => {
 })
 
 
-
-
-/*
-app.post('/admin/insert', (req, res) => {
-
-  imageUpload(req, res, error => {
-      if(error){
-          return res.render('admin/errorPage', {message: error})
-      }else if(!req.file){
-          return res.render('admin/errorPage', {message: 'No file selected'});
-      }
-
-      const productTitle = req.body.title;
-      const productPrice = req.body.price;
-      const productDescription = req.body.description;
-      const productImage = req.file.filename;
-      
-            
-      products.doc().set({productTitle, productImage, productPrice, productDescription})
-      .then(result => {
-          res.redirect('/admin/dashboard-products')
-      })
-      .catch(error => {
-          res.render('errorPage', {
-              source: '/admin/insert',
-              error
-          });
-      })
-  })
-})
-
-*/
 
 //----------------------------------
 // HOMEPAGE GET ROUTE
