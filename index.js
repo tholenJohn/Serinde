@@ -200,9 +200,7 @@ app.post('/resetpassword', (req, res) => {
 })
 
 
-//----------------------------------
-// SELLERPAGE GET ROUTE
-//----------------------------------
+
 
 const multer = require('multer');
 const path = require('path');
@@ -233,6 +231,11 @@ const imageUpload = multer( {
         }
     }
 }).single('file_source');
+
+
+//----------------------------------
+// SELLERPAGE GET ROUTE
+//----------------------------------
 
 //Lifting auth for easy testing
 app.get('/sellerprofile' /*, auth*/,(req, res) => {
@@ -412,7 +415,6 @@ app.post('/sellerprofile/productdelete', (req, res) => {
 //----------------------------------
 // USERPAGE GET ROUTE
 //----------------------------------
-//TODO seller with id for specific seller
 app.get('/userprofile', (req, res) => {
     const userEmail = firebase.auth().currentUser.email
     console.log(userEmail)
@@ -422,6 +424,10 @@ app.get('/userprofile', (req, res) => {
     })
 })
 
+
+//----------------------------------
+// UPDATE USERPAGE POST ROUTE
+//----------------------------------
 app.post('/updateuserprofile', auth,(req, res) => {
 
   const sellerid = "GGoWWB8HPBaTMJw4eGU3";
@@ -446,9 +452,41 @@ app.post('/updateuserprofile', auth,(req, res) => {
 // HOMEPAGE GET ROUTE
 //----------------------------------
 app.get('/', (_req,res) => {
-  if(firebase.auth().currentUser)
-    res.render('storefront',{nav: 'storefront', email: firebase.auth().currentUser.email, login: true});
-  else res.render('storefront',{nav: 'storefront', email: '', login: false});
+    var products = []
+    var categories = []
+    var uniqueCategories = []
+
+  if(firebase.auth().currentUser) {
+    res.render('storefront',{nav: 'storefront', 
+                email: firebase.auth().currentUser.email, 
+                login: true});
+  } else {
+      productsCollection.get()
+            .then(productSnap => {
+                productSnap.forEach(singleProduct => {
+                    //store categories and products
+                    categories.push(singleProduct.data().ProductCategory)
+                    products.push(singleProduct)
+                })
+                //filter by unique categories
+                uniqueCategories = Array.from(new Set(categories))
+                //console.log(uniqueCategories)
+                res.render('storefront',
+                {nav: 'storefront', 
+                email: '', 
+                products,
+                uniqueCategories,
+                login: false});
+            }) 
+            .catch (error => {
+                res.render('errorpage',{message : error.message})
+            })
+    }
+
+
+//----------------------------------
+// CONTACT PAGE GET ROUTE
+//----------------------------------
 app.get('/contact', (req, res) => {
     res.render('main.handlebars',{nav: 'contact'});
   });
@@ -509,6 +547,9 @@ app.get('/contact', (req, res) => {
     //NODEMAILER CONFIG. ENDS
     //==========================================================
   })
+
+
+
 //==========================================================
 //logout 
 //==========================================================

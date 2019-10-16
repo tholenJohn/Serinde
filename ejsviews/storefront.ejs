@@ -16,6 +16,7 @@
 
     <% include ../partials/nav %>
 
+    
 
     <div class="container-fluid left_column">
         <div class="row">
@@ -27,25 +28,35 @@
                     <br />
                     The border color is to give you an idea of the dimension of each of the columns and rows.
                 </p>
+                
             </div>
             <div class="col-7 col_adjust right">
-                <div class="row">
-                    <h3>Category name - SubCategory Name</h3>
-                    <hr>
-                    <!-- slidable row of random 10 items of this category loaded into 10 cards -->
-                    <div>
-                        <div style="border: 3px solid red">
-                            <div class="card" style="width: 18rem;">
-                                <img class="card_row" class="card-img-top" src="..." alt="Missing Image">
-                                <div class="card-body">
-                                    <h5 class="card-title">Item Name</h5>
-                                    <p class="card-text">Short description of item</p>
-                                    <a href="#" class="card-link">See Item</a>
-                                </div>
+                <% for(let i = 0; i < uniqueCategories.length; i++) { %>
+                    <div class="row">
+                            <h3> <%= uniqueCategories[i] %> </h3>
+                            <hr>
+                            <!-- slidable row of random 10 items of this category loaded into 10 cards -->
+                            <div>
+                                    
+                                <% products.forEach(product => { %>
+                                    
+                                        <% if (product.data().ProductCategory === uniqueCategories[i]) { %>
+                                    <div class="oneCard">
+                                        <div class="card" style="width: 18rem;">
+                                            <img class="card_row" class="card-img-top" src="/./public/images/<%=product.data().ProductImage %>" alt="Missing Image">
+                                            <div class="card-body">
+                                                <h5 class="card-title"> <%= product.data().ProductTitle %> </h5>
+                                                <p class="card-text"> <%= product.data().ProductDescription %> </p>
+                                                <a href="#" class="card-link">See Item</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <% } %>
+                                <% }) %>
+                            
                         </div>
                     </div>
-                </div>
-            </div>
+                <%   } %>
         </div>
     </div>
 
