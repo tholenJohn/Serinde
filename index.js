@@ -253,7 +253,11 @@ app.get('/sellerprofile' /*, auth*/,(req, res) => {
                 products.push(product)
               })
              //setTimeout(() => {console.log(products)}, 3000)
-             res.render('sellerprofile', {products, seller, utils, source: 'sellerprofile'})
+             res.render('sellerprofile', 
+                {products, 
+                seller, 
+                utils, 
+                source: 'sellerprofile'})
             })
 
          })
@@ -457,9 +461,12 @@ app.get('/', (_req,res) => {
     var uniqueCategories = []
 
   if(firebase.auth().currentUser) {
-    res.render('storefront',{nav: 'storefront', 
-                email: firebase.auth().currentUser.email, 
-                login: true});
+    res.render('storefront',
+    {nav: 'storefront', 
+    email: firebase.auth().currentUser.email, 
+    products,
+    uniqueCategories,
+    login: true});
   } else {
       productsCollection.get()
             .then(productSnap => {
@@ -556,7 +563,7 @@ app.get('/contact', (req, res) => {
 app.get('/logout', (req, res) => {
   firebase.auth().signOut()
   .then (result => {
-    res.render('storefront',{nav: 'storefront', email: '', login: false});
+    res.redirect('/');
   })
   .catch(error => {
     res.send(error)

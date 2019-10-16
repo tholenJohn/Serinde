@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <%- include ../partials/header %>
-    <link rel="stylesheet" type="text/css" href="../public/css/basiclayout.css">
+    <link rel="stylesheet" type="text/css" href="../public/css/storefront.css">
     <link rel="stylesheet" href="css/styles.css?v=1.0">
     <title>Serinde</title>
 
@@ -16,47 +16,103 @@
 
     <% include ../partials/nav %>
 
-    
 
-    <div class="container-fluid left_column">
+
+    <div class="container-fluid ">
         <div class="row">
-            <div class="col-3  col_adjust left">
+            <div class="col-3 column-1">
                 <!-- Category should be listed here -->
-                <p>
-                    Category should be listed here (not inside a dropdown)
-                    Use CSS to design your dropdown if you want to.
-                    <br />
-                    The border color is to give you an idea of the dimension of each of the columns and rows.
-                </p>
-                
-            </div>
-            <div class="col-7 col_adjust right">
+                <div class="vertical-menu left-menu">
+                    <a href="#" class="active"><i class="fa fa-bars"></i> Categories</a>
+
+                    <ul class="mainmenu">
+                        <li><a href="">Men's Fashion</a>
+                            <ul class="submenu">
+                                <li><a href="">Tops</a></li>
+                                <li><a href="">Bottoms</a></li>
+                                <li><a href="">Footwear</a></li>
+                            </ul>
+                        </li>
+
+                        <li><a href="">Women's Fashion</a>
+                            <ul class="submenu">
+                                <li><a href="">Tops</a></li>
+                                <li><a href="">Bottoms</a></li>
+                                <li><a href="">Footwear</a></li>
+                            </ul>
+                        </li>
+
+                        <li><a href="">Children's Fashion</a>
+                            <ul class="submenu">
+                                <li><a href="">Tops</a></li>
+                                <li><a href="">Bottoms</a></li>
+                                <li><a href="">Footwear</a></li>
+                            </ul>
+                        </li>
+
+                        <li><a href="">Babies' Fashion</a>
+                            <ul class="submenu">
+                                <li><a href="">Tops</a></li>
+                                <li><a href="">Bottoms</a></li>
+                                <li><a href="">Footwear</a></li>
+                            </ul>
+                        </li>
+
+                        <li><a href="">Skin Care Products</a>
+                            <ul class="submenu">
+                                <li><a href="">Body Lotion & Creams</a></li>
+                                <li><a href="">Facial Cleansers </a></li>
+                                <li><a href="">Facial Treatments</a></li>
+                            </ul>
+                        </li>
+
+                        <li><a href="">Hair Care Products</a>
+                            <ul class="submenu">
+                                <li><a href="">Shampoo & Conditioners</a></li>
+                                <li><a href="">Hair Treatments</a></li>
+                                <li><a href="">Styling Tools</a></li>
+                            </ul>
+                        </li>
+
+                        <li><a href="">Electronics</a>
+                            <ul class="submenu">
+                                <li><a href="">Laptops Computers</a></li>
+                                <li><a href="">Desktop Computers</a></li>
+                                <li><a href="">Cell phones & Accessories</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div> <!-- END col-3 column END -->
+            
+            <div class="col-7" style="border: 3px solid brown">
+                    <div class="column-2">
                 <% for(let i = 0; i < uniqueCategories.length; i++) { %>
-                    <div class="row">
-                            <h3> <%= uniqueCategories[i] %> </h3>
-                            <hr>
-                            <!-- slidable row of random 10 items of this category loaded into 10 cards -->
-                            <div>
-                                    
-                                <% products.forEach(product => { %>
-                                    
-                                        <% if (product.data().ProductCategory === uniqueCategories[i]) { %>
-                                    <div class="oneCard">
-                                        <div class="card" style="width: 18rem;">
-                                            <img class="card_row" class="card-img-top" src="/./public/images/<%=product.data().ProductImage %>" alt="Missing Image">
-                                            <div class="card-body">
-                                                <h5 class="card-title"> <%= product.data().ProductTitle %> </h5>
-                                                <p class="card-text"> <%= product.data().ProductDescription %> </p>
-                                                <a href="#" class="card-link">See Item</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <% } %>
-                                <% }) %>
-                            
+                <div class="row">
+                    <h3> <%= uniqueCategories[i] %> </h3>
+                    <hr>
+                    <!-- slidable row of random 10 items of this category loaded into 10 cards -->
+                    <div class="row-config">
+                        <% products.forEach(product => { %>
+                        <% if (product.data().ProductCategory === uniqueCategories[i]) { %>
+                        <div class="oneCard each-card">
+                            <div class="card" style="width: 18rem;">
+                                <img class="img-config" class="card_row" class="card-img-top"
+                                    src="/./public/images/<%=product.data().ProductImage %>" alt="Missing Image">
+                                <div class="card-body">
+                                    <h5 class="card-title"> <a href="#" class="card-link"><%= product.data().ProductTitle %></a> </h5>
+                                    <p class="card-text desc-limit"> <%= product.data().ProductDescription %> </p>
+                                    <a href="#" class="card-link">Add to Cart</a>
+                                </div>
+                            </div>
                         </div>
+                        <% } %>
+                        <% }) %>
                     </div>
+                </div>
                 <%   } %>
+            </div>
+        </div>
         </div>
     </div>
 
