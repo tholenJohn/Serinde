@@ -1,0 +1,49 @@
+body {
+    margin: 0;
+    background-color: #f9feff;
+    font-size: 15px;
+}
+
+h3 {
+    font-size: 24px;
+    width: 100%;
+    text-align: center;
+}
+
+.column-1 {
+    background: #d18c54c9;
+    display: flex;
+    padding: 10px 20px;
+    height: auto;
+}
+
+.column-1 a {
+    color: #8B4513;
+}
+
+.column-2 {
+
+}
+
+.row-config {
+    display: flex;
+    overflow-x: scroll;
+    padding: 10px;
+}
+
+.each-card {
+    padding: 5px;
+    
+}
+
+.img-config {
+    height: 200px;
+}
+
+
+.desc-limit {
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
