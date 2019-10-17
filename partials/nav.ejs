@@ -33,7 +33,7 @@
             <li class="nav-item <%= nav == 'contact' ? 'active' : ''%>">
                 <a class="nav-link" href="/contact">Contact Us</a>
             </li>
-            <% if (!login) { %>
+            <% if (!fb.auth().currentUser) { %>
                 <li class="login">
                     <a class="btn btn-primary" href="/login" role="button">Login</a>
                 </li>
@@ -41,7 +41,7 @@
                     <li class="dropdown">
                         <div class="dropdown">
                             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-								<%= email %>  
+								<%= fb.auth().currentUser.email %>  
 								</button>
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                 <a class="dropdown-item" href="/userprofile">User Profile</a>

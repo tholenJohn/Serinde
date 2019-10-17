@@ -459,15 +459,6 @@ app.get('/', (_req,res) => {
     var products = []
     var categories = []
     var uniqueCategories = []
-
-  if(firebase.auth().currentUser) {
-    res.render('storefront',
-    {nav: 'storefront', 
-    email: firebase.auth().currentUser.email, 
-    products,
-    uniqueCategories,
-    login: true});
-  } else {
       productsCollection.get()
             .then(productSnap => {
                 productSnap.forEach(singleProduct => {
@@ -480,15 +471,14 @@ app.get('/', (_req,res) => {
                 //console.log(uniqueCategories)
                 res.render('storefront',
                 {nav: 'storefront', 
-                email: '', 
+                fb: firebase, 
                 products,
-                uniqueCategories,
-                login: false});
+                uniqueCategories});
             }) 
             .catch (error => {
                 res.render('errorpage',{message : error.message})
             })
-    }
+    
 
 
 //----------------------------------
