@@ -200,9 +200,7 @@ app.post('/resetpassword', (req, res) => {
 })
 
 
-//----------------------------------
-// SELLERPAGE GET ROUTE
-//----------------------------------
+
 
 const multer = require('multer');
 const path = require('path');
@@ -229,10 +227,15 @@ const imageUpload = multer( {
         if(ext && mimetype){
             return callback(null, true)
         }else{
-            return callback('Error: Images (jpeg, jpg, png, git) only');
+            return callback('Error: Images (jpeg, jpg, png, gif) only');
         }
     }
 }).single('file_source');
+
+
+//----------------------------------
+// SELLERPAGE GET ROUTE
+//----------------------------------
 
 //Lifting auth for easy testing
 app.get('/sellerprofile' /*, auth*/,(req, res) => {
@@ -250,7 +253,11 @@ app.get('/sellerprofile' /*, auth*/,(req, res) => {
                 products.push(product)
               })
              //setTimeout(() => {console.log(products)}, 3000)
-             res.render('sellerprofile', {products, seller, utils, source: 'sellerprofile'})
+             res.render('sellerprofile', 
+                {products, 
+                seller, 
+                utils, 
+                source: 'sellerprofile'})
             })
 
          })
@@ -278,24 +285,52 @@ app.get('/sellerprofile/productupdate', (req, res) => {
                     })
                 })
                 .catch(error => {
-                    res.render('errorPage', {
-                        source: '',
-                        error
-                    })
+                    res.render('errorPage', 
+                      {message: error}
+                    )
                 })   
           })
           .catch(error => {
-            //
+            res.render('errorPage', 
+                      {message: error}
+                    )
           })
-
 })
 
 app.post('/sellerprofile/productupdate', (req, res) => {
+
+  imageUpload(req, res, error => {
+    if(error){
+        return res.render('errorpage', {message: error})
+    }else if(!req.file){
+      //return res.render('errorpage', {message: "File not found!"})
+      const productId = req.body.id;
+      let data = {
+        ProductCategory : req.body.category,
+        ProductDescription : req.body.description,
+        ProductImage : req.body.productImage,
+        ProductPrice : req.body.price,
+        ProductTitle : req.body.title,
+        SellerId : 'I07Uu1R0nUrYs3obRE1B'
+      }
+          
+      productsCollection.doc(productId).set(data)
+      .then(result => {
+          res.redirect('/sellerprofile')
+      })
+      .catch(error => {
+          res.render('errorPage', {
+              source: '/sellerprofile#products',
+              error
+          });
+      })
+    }else{
+
   const productId = req.body.id;
   let data = {
     ProductCategory : req.body.category,
     ProductDescription : req.body.description,
-    ProductImage : req.body.productImage,
+    ProductImage : req.file.filename,
     ProductPrice : req.body.price,
     ProductTitle : req.body.title,
     SellerId : 'I07Uu1R0nUrYs3obRE1B'
@@ -307,11 +342,12 @@ app.post('/sellerprofile/productupdate', (req, res) => {
   })
   .catch(error => {
       res.render('errorPage', {
-          source: '/sellerprofile',
+          source: '/sellerprofile#products',
           error
       });
   })
-
+ }
+ })
 })
 
 app.post('/sellerprofile/productadd', (req, res) => {
@@ -383,7 +419,6 @@ app.post('/sellerprofile/productdelete', (req, res) => {
 //----------------------------------
 // USERPAGE GET ROUTE
 //----------------------------------
-//TODO seller with id for specific seller
 app.get('/userprofile', (req, res) => {
     const userEmail = firebase.auth().currentUser.email
     console.log(userEmail)
@@ -393,6 +428,10 @@ app.get('/userprofile', (req, res) => {
     })
 })
 
+
+//----------------------------------
+// UPDATE USERPAGE POST ROUTE
+//----------------------------------
 app.post('/updateuserprofile', auth,(req, res) => {
 
   const sellerid = "GGoWWB8HPBaTMJw4eGU3";
@@ -417,9 +456,44 @@ app.post('/updateuserprofile', auth,(req, res) => {
 // HOMEPAGE GET ROUTE
 //----------------------------------
 app.get('/', (_req,res) => {
-  if(firebase.auth().currentUser)
-    res.render('storefront',{nav: 'storefront', email: firebase.auth().currentUser.email, login: true});
-  else res.render('storefront',{nav: 'storefront', email: '', login: false});
+    var products = []
+    var categories = []
+    var uniqueCategories = []
+
+  if(firebase.auth().currentUser) {
+    res.render('storefront',
+    {nav: 'storefront', 
+    email: firebase.auth().currentUser.email, 
+    products,
+    uniqueCategories,
+    login: true});
+  } else {
+      productsCollection.get()
+            .then(productSnap => {
+                productSnap.forEach(singleProduct => {
+                    //store categories and products
+                    categories.push(singleProduct.data().ProductCategory)
+                    products.push(singleProduct)
+                })
+                //filter by unique categories
+                uniqueCategories = Array.from(new Set(categories))
+                //console.log(uniqueCategories)
+                res.render('storefront',
+                {nav: 'storefront', 
+                email: '', 
+                products,
+                uniqueCategories,
+                login: false});
+            }) 
+            .catch (error => {
+                res.render('errorpage',{message : error.message})
+            })
+    }
+
+
+//----------------------------------
+// CONTACT PAGE GET ROUTE
+//----------------------------------
 app.get('/contact', (req, res) => {
     res.render('main.handlebars',{nav: 'contact'});
   });
@@ -480,13 +554,16 @@ app.get('/contact', (req, res) => {
     //NODEMAILER CONFIG. ENDS
     //==========================================================
   })
+
+
+
 //==========================================================
 //logout 
 //==========================================================
 app.get('/logout', (req, res) => {
   firebase.auth().signOut()
   .then (result => {
-    res.render('storefront',{nav: 'storefront', email: '', login: false});
+    res.redirect('/');
   })
   .catch(error => {
     res.send(error)

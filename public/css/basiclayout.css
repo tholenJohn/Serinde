@@ -1,4 +1,6 @@
-
+body {
+    margin: 0;
+}
 
 .container {
     background-color: aqua;
@@ -60,4 +62,8 @@ h3 {
 
 .card_row {
     height: 200px;
+}
+
+.oneCard {
+    display: inline;
 }
