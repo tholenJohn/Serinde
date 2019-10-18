@@ -77,6 +77,9 @@ app.get('/changeemail', auth, (req, res) => {
 app.post('/changeemail', auth, (req, res) => {
     const oldEmail = firebase.auth().currentUser.email
     const userEmail = req.body.email
+    if(oldEmail == userEmail){
+        return res.redirect('/userprofile')
+    }
     firebase.auth().currentUser.updateEmail(userEmail)
         .then(result => {
             // update user collection where it is their old email and update the entry
