@@ -1,4 +1,3 @@
-
 // All npm imports
 const express = require('express')
 var admin = require('firebase-admin')
@@ -8,7 +7,7 @@ const bodyParser = require('body-parser')
 const exphbs = require('express-handlebars')
 const pa = require('path')
 const nodemailer = require('nodemailer')
-const session  = require ('express-session')
+const session = require('express-session')
 const fs = require('fs')
 const utils = require('./utils.js')
 
@@ -17,7 +16,7 @@ const serviceAccount = require("./serinde-dae45-firebase-adminsdk-z0zyl-40de77fb
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
     databaseURL: "https://serinde-dae45.firebaseio.com"
-  });
+});
 const db = admin.firestore();
 const sellers = db.collection('sellers')
 const users = db.collection('users')
@@ -37,15 +36,15 @@ firebase.initializeApp(firebaseConfig);
 
 
 //All local imports
-app.set('view engine', 'handlebars'); 
+app.set('view engine', 'handlebars');
 app.engine('handlebars', exphbs());
 app.set('view engine', 'ejs');
-app.set('views','./ejsviews');
-app.use('/public', express.static(pa.join(__dirname +'/public')));
+app.set('views', './ejsviews');
+app.use('/public', express.static(pa.join(__dirname + '/public')));
 
 
- app.use(bodyParser.urlencoded({ extended: false }));
- app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 
 //----------------------------------
@@ -61,68 +60,69 @@ app.listen(PORT, () => {
 //----------------------------------
 // LOGIN PAGE GET ROUTE
 //----------------------------------
-app.get('/login', (req,res)=>{
-  res.render("login")
+app.get('/login', (req, res) => {
+    res.render("login")
 })
 
 //----------------------------------
 // CHANGE EMAIL PAGE GET ROUTE
 //----------------------------------
-app.get('/changeemail', auth, (req,res)=>{
-  res.render("changeemail")
+app.get('/changeemail', auth, (req, res) => {
+    res.render("changeemail")
 })
 
 //----------------------------------
 // CHANGE EMAIL POST ROUTE
 //----------------------------------
-app.post('/changeemail',auth,(req,res)=>{
-  const oldEmail = firebase.auth().currentUser.email
-  const userEmail = req.body.email
+app.post('/changeemail', auth, (req, res) => {
+    const oldEmail = firebase.auth().currentUser.email
+    const userEmail = req.body.email
     firebase.auth().currentUser.updateEmail(userEmail)
         .then(result => {
-          // update user collection where it is their old email and update the entry
-            users.doc(oldEmail).get().then(oldDoc=>{
-              if(oldDoc && oldDoc.exists){
-                var data = oldDoc.data()
-                users.doc(userEmail).set({Email: userEmail, 
-                                          FirstName : data.FirstName, 
-                                          LastName: data.FirstName, 
-                                          Location: data.Location, 
-                                          ProfilePicUrl: data.ProfilePicUrl})
-                    .then(result=>{
-                        users.doc(oldEmail).delete() // deleting old email document
-                        users.doc(userEmail).get().then(doc=>{ // getting new information to send to profile
-                        data = doc.data()
-                        res.render('userprofile', {data})
-                      })
-                  })// creating another doc with the same data
-                
-              }
+            // update user collection where it is their old email and update the entry
+            users.doc(oldEmail).get().then(oldDoc => {
+                if (oldDoc && oldDoc.exists) {
+                    var data = oldDoc.data()
+                    users.doc(userEmail).set({
+                            Email: userEmail,
+                            FirstName: data.FirstName,
+                            LastName: data.FirstName,
+                            Location: data.Location,
+                            ProfilePicUrl: data.ProfilePicUrl
+                        })
+                        .then(result => {
+                            users.doc(oldEmail).delete() // deleting old email document
+                            users.doc(userEmail).get().then(doc => { // getting new information to send to profile
+                                data = doc.data()
+                                res.render('userprofile', { data })
+                            })
+                        }) // creating another doc with the same data
+
+                }
             })
         })
         .catch(error => {
             res.render('errorPage', { message: error.message })
         })
-  
+
 })
 
 //----------------------------------
 // LOGIN PAGE POST ROUTE
 //----------------------------------
 app.post('/login', (req, res) => {
-  const email = req.body.email
-  const password = req.body.password
-  firebase.auth().signInWithEmailAndPassword(email, password)
-      .then(result => {
-          res.redirect('/') // to homepage
-      })
-      .catch(error => {
-          if (email == "") {
-              res.render('errorPage', { message: "The email is blank!" })
-          }
-          else
-              res.render('errorPage', { message: error.message })
-      })
+    const email = req.body.email
+    const password = req.body.password
+    firebase.auth().signInWithEmailAndPassword(email, password)
+        .then(result => {
+            res.redirect('/') // to homepage
+        })
+        .catch(error => {
+            if (email == "") {
+                res.render('errorPage', { message: "The email is blank!" })
+            } else
+                res.render('errorPage', { message: error.message })
+        })
 })
 
 
@@ -130,7 +130,7 @@ app.post('/login', (req, res) => {
 // SIGNUP PAGE GET ROUTE
 //----------------------------------
 app.get('/signup', (req, res) => {
-  res.render('signup')
+    res.render('signup')
 })
 
 
@@ -138,39 +138,38 @@ app.get('/signup', (req, res) => {
 // SIGNUP PAGE POST ROUTE
 //----------------------------------
 app.post('/signup', (req, res) => {
-  const email = req.body.email
-  const password = req.body.password
-  const confirmpassword = req.body.confirmpassword
-  const first = req.body.first
-  const last = req.body.last
-  const location = req.body.location
-  if (password == confirmpassword) {
-      //signup
-      firebase.auth().createUserWithEmailAndPassword(email, password)
-          .then(result => {
-              //creating new document for the new user
-              users.doc(email).set({FirstName: first, LastName: last, Location:location, Email: email, ProfilePicUrl:""})
-                      .then(result => {
+    const email = req.body.email
+    const password = req.body.password
+    const confirmpassword = req.body.confirmpassword
+    const first = req.body.first
+    const last = req.body.last
+    const location = req.body.location
+    if (password == confirmpassword) {
+        //signup
+        firebase.auth().createUserWithEmailAndPassword(email, password)
+            .then(result => {
+                //creating new document for the new user
+                users.doc(email).set({ FirstName: first, LastName: last, Location: location, Email: email, ProfilePicUrl: "" })
+                    .then(result => {
                         //signing in and redirecting to storefront with new account
                         firebase.auth().signInWithEmailAndPassword(email, password)
-                        .then(result => {
-                            res.redirect('/') // to homepage
-                        })
-                        .catch(error => {
-                            res.render('errorPage', { message: error.message })
-                        })
-                   })
-                  .catch(error => {
-                    res.render('errorpage', {message : error.message})
-                   })  
-          })
-          .catch(error => {
-              res.render('errorPage', { message: error.message })
-          }) 
-  }
-  else {
-      res.render('errorPage', { message: "The passwords do not match." })
-  }
+                            .then(result => {
+                                res.redirect('/') // to homepage
+                            })
+                            .catch(error => {
+                                res.render('errorPage', { message: error.message })
+                            })
+                    })
+                    .catch(error => {
+                        res.render('errorpage', { message: error.message })
+                    })
+            })
+            .catch(error => {
+                res.render('errorPage', { message: error.message })
+            })
+    } else {
+        res.render('errorPage', { message: "The passwords do not match." })
+    }
 })
 
 
@@ -189,11 +188,11 @@ app.post('/resetpassword', (req, res) => {
     const email = req.body.email
     const auth = firebase.auth()
 
-    if(email != "") {
+    if (email != "") {
         auth.sendPasswordResetEmail(email)
-                .then(result => {
-                    res.redirect('/login')
-                })
+            .then(result => {
+                res.redirect('/login')
+            })
     } else {
         res.render('errorPage', { message: "Enter a valid email" })
     }
@@ -213,20 +212,20 @@ const storageOptions = multer.diskStorage({
         callback(null, './public/images');
     },
     filename: (req, file, callback) => {
-        callback(null, 'image'+Date.now()+path.extname(file.originalname))
+        callback(null, 'image' + Date.now() + path.extname(file.originalname))
     }
 })
 
-const imageUpload = multer( {
+const imageUpload = multer({
     storage: storageOptions,
-    limits: {fileSize: MAX_FILESIZE},
+    limits: { fileSize: MAX_FILESIZE },
     fileFilter: (req, file, callback) => {
         const ext = fileTypes.test(path.extname(file.originalname).toLowerCase());
         const mimetype = fileTypes.test(file.mimetype);
 
-        if(ext && mimetype){
+        if (ext && mimetype) {
             return callback(null, true)
-        }else{
+        } else {
             return callback('Error: Images (jpeg, jpg, png, gif) only');
         }
     }
@@ -238,42 +237,43 @@ const imageUpload = multer( {
 //----------------------------------
 
 //Lifting auth for easy testing
-app.get('/sellerprofile' /*, auth*/,(req, res) => {
-  //get products, seller info 
+app.get('/sellerprofile' /*, auth*/ , (req, res) => {
+    //get products, seller info 
 
 
-  var products = []
-  var seller
+    var products = []
+    var seller
 
-  sellers.doc('I07Uu1R0nUrYs3obRE1B').get()
-         .then(sellerSnap => {
+    sellers.doc('I07Uu1R0nUrYs3obRE1B').get()
+        .then(sellerSnap => {
             seller = sellerSnap
             productsCollection.get().then(productSnap => {
-              productSnap.forEach(product => { 
-                products.push(product)
-              })
-             //setTimeout(() => {console.log(products)}, 3000)
-             res.render('sellerprofile', 
-                {products, 
-                seller, 
-                utils, 
-                source: 'sellerprofile'})
+                productSnap.forEach(product => {
+                        products.push(product)
+                    })
+                    //setTimeout(() => {console.log(products)}, 3000)
+                res.render('sellerprofile', {
+                    products,
+                    seller,
+                    utils,
+                    source: 'sellerprofile'
+                })
             })
 
-         })
-         .catch(error => {
-           //
-         })
+        })
+        .catch(error => {
+            //
+        })
 
 })
 
 app.get('/sellerprofile/productupdate', (req, res) => {
-  const _id = req.query._id;
+    const _id = req.query._id;
 
-  var seller
+    var seller
 
-  sellers.doc('I07Uu1R0nUrYs3obRE1B').get()
-         .then(sellerSnap => {
+    sellers.doc('I07Uu1R0nUrYs3obRE1B').get()
+        .then(sellerSnap => {
             seller = sellerSnap
             productsCollection.doc(_id).get()
                 .then(product => {
@@ -285,134 +285,130 @@ app.get('/sellerprofile/productupdate', (req, res) => {
                     })
                 })
                 .catch(error => {
-                    res.render('errorPage', 
-                      {message: error}
-                    )
-                })   
-          })
-          .catch(error => {
-            res.render('errorPage', 
-                      {message: error}
-                    )
-          })
+                    res.render('errorPage', { message: error })
+                })
+        })
+        .catch(error => {
+            res.render('errorPage', { message: error })
+        })
 })
 
 app.post('/sellerprofile/productupdate', (req, res) => {
 
-  imageUpload(req, res, error => {
-    if(error){
-        return res.render('errorpage', {message: error})
-    }else if(!req.file){
-      //return res.render('errorpage', {message: "File not found!"})
-      const productId = req.body.id;
-      let data = {
-        ProductCategory : req.body.category,
-        ProductDescription : req.body.description,
-        ProductImage : req.body.productImage,
-        ProductPrice : req.body.price,
-        ProductTitle : req.body.title,
-        SellerId : 'I07Uu1R0nUrYs3obRE1B'
-      }
-          
-      productsCollection.doc(productId).set(data)
-      .then(result => {
-          res.redirect('/sellerprofile')
-      })
-      .catch(error => {
-          res.render('errorPage', {
-              source: '/sellerprofile#products',
-              error
-          });
-      })
-    }else{
+    imageUpload(req, res, error => {
+        if (error) {
+            return res.render('errorpage', { message: error })
+        } else if (!req.file) {
+            //return res.render('errorpage', {message: "File not found!"})
+            const productId = req.body.id;
+            let data = {
+                ProductCategory: req.body.category,
+                ProductDescription: req.body.description,
+                ProductImage: req.body.productImage,
+                ProductPrice: req.body.price,
+                ProductTitle: req.body.title,
+                SellerId: 'I07Uu1R0nUrYs3obRE1B'
+            }
 
-  const productId = req.body.id;
-  let data = {
-    ProductCategory : req.body.category,
-    ProductDescription : req.body.description,
-    ProductImage : req.file.filename,
-    ProductPrice : req.body.price,
-    ProductTitle : req.body.title,
-    SellerId : 'I07Uu1R0nUrYs3obRE1B'
-  }
-      
-  productsCollection.doc(productId).set(data)
-  .then(result => {
-      res.redirect('/sellerprofile')
-  })
-  .catch(error => {
-      res.render('errorPage', {
-          source: '/sellerprofile#products',
-          error
-      });
-  })
- }
- })
+            productsCollection.doc(productId).set(data)
+                .then(result => {
+                    res.redirect('/sellerprofile')
+                })
+                .catch(error => {
+                    res.render('errorPage', {
+                        source: '/sellerprofile#products',
+                        error
+                    });
+                })
+        } else {
+
+            const productId = req.body.id;
+            let data = {
+                ProductCategory: req.body.category,
+                ProductDescription: req.body.description,
+                ProductImage: req.file.filename,
+                ProductPrice: req.body.price,
+                ProductTitle: req.body.title,
+                SellerId: 'I07Uu1R0nUrYs3obRE1B'
+            }
+
+            productsCollection.doc(productId).set(data)
+                .then(result => {
+                    res.redirect('/sellerprofile')
+                })
+                .catch(error => {
+                    res.render('errorPage', {
+                        source: '/sellerprofile#products',
+                        error
+                    });
+                })
+        }
+    })
 })
 
 app.post('/sellerprofile/productadd', (req, res) => {
 
-  imageUpload(req, res, error => {
-    if(error){
-        return res.render('errorpage', {message: error})
-    }else if(!req.file){
-        return res.render('errorpage', {message: 'No file selected'});
-    }
+    imageUpload(req, res, error => {
+        if (error) {
+            return res.render('errorpage', { message: error })
+        } else if (!req.file) {
+            return res.render('errorpage', { message: 'No file selected' });
+        }
 
-    let data = {
-      ProductCategory : req.body.category,
-      ProductDescription : req.body.description,
-      ProductImage : req.file.filename,
-      ProductPrice : req.body.price,
-      ProductTitle : req.body.title,
-      SellerId : 'I07Uu1R0nUrYs3obRE1B'
-    }
-        
-    productsCollection.doc().set(data)
-    .then(result => {
-        res.redirect('/sellerprofile')
+        let data = {
+            ProductCategory: req.body.category,
+            ProductDescription: req.body.description,
+            ProductImage: req.file.filename,
+            ProductPrice: req.body.price,
+            ProductTitle: req.body.title,
+            SellerId: 'I07Uu1R0nUrYs3obRE1B'
+        }
+
+        productsCollection.doc().set(data)
+            .then(result => {
+                res.redirect('/sellerprofile')
+            })
+            .catch(error => {
+                res.render('errorPage', {
+                    source: '/sellerprofile#products',
+                    error
+                });
+            })
     })
-    .catch(error => {
-        res.render('errorPage', {
-            source: '/sellerprofile#products',
-            error
-        });
-    })
-  })
 })
 
 app.post('/sellerprofile/productdelete', (req, res) => {
-  const productId = req.body.id;  //productId 
-  
-  //get imagefilename 
-  productsCollection.doc(productId).get()
-      .then(doc => {
-          if(doc.exists){
-              imagefilename = doc.data().ProductImage;
-              fs.unlink('./public/images/' + imagefilename, (error) => {
-                  if(error){
-                      res.render('errorpage', {message: 'fs.unlink error to delete image file'})
-                  }
-              })
-          }
-      })
-      .catch(error => {
-          res.render('errorpage', {
-              source: 'sellerprofile#product',
-              error
-          })
-      })
-  //delete from firebase
-  productsCollection.doc(productId).delete()
-      .then(result => {
-          res.redirect('/sellerprofile')
-      })
-      .catch(error => {
-          res.render('errorpage', {
-              source: 'sellerprofile#product',
-              error
-          })
-      });
+    const productId = req.body.id; //productId 
+
+    //get imagefilename 
+    productsCollection.doc(productId).get()
+        .then(doc => {
+            if (doc.exists) {
+                imagefilename = doc.data().ProductImage;
+                fs.unlink('./public/images/' + imagefilename, (error) => {
+                    if (error) {
+                        res.render('errorpage', { message: 'fs.unlink error to delete image file' })
+                    }
+                })
+            }
+        })
+        .catch(error => {
+            res.render('errorpage', {
+                source: 'sellerprofile#product',
+                error
+            })
+        })
+        //delete from firebase
+    productsCollection.doc(productId).delete()
+        .then(result => {
+            res.redirect('/sellerprofile')
+        })
+        .catch(error => {
+            res.render('errorpage', {
+                source: 'sellerprofile#product',
+                error
+            })
+        });
 })
 
 
@@ -422,9 +418,9 @@ app.post('/sellerprofile/productdelete', (req, res) => {
 app.get('/userprofile', (req, res) => {
     const userEmail = firebase.auth().currentUser.email
     console.log(userEmail)
-    users.doc(userEmail).get().then(doc=>{
-      var data = doc.data()
-      res.render('userprofile', {data})
+    users.doc(userEmail).get().then(doc => {
+        var data = doc.data()
+        res.render('userprofile', { data })
     })
 })
 
@@ -432,21 +428,21 @@ app.get('/userprofile', (req, res) => {
 //----------------------------------
 // UPDATE USERPAGE POST ROUTE
 //----------------------------------
-app.post('/updateuserprofile', auth,(req, res) => {
+app.post('/updateuserprofile', auth, (req, res) => {
 
-  const sellerid = "GGoWWB8HPBaTMJw4eGU3";
-  const Email = req.body.email;
-  const FirstName = req.body.firstName;
-  const LastName = req.body.lastName;
-  const ProfilePicUrl = ""
-  
-  sellers.doc(sellerid).set({FirstName, LastName, Email, ProfilePicUrl})
-  .then(result => {
-    res.redirect('/userprofile')
-  })
-  .catch(error => {
-    res.render('errorpage',{message : error.message})
-  })   
+    const sellerid = "GGoWWB8HPBaTMJw4eGU3";
+    const Email = req.body.email;
+    const FirstName = req.body.firstName;
+    const LastName = req.body.lastName;
+    const ProfilePicUrl = ""
+
+    sellers.doc(sellerid).set({ FirstName, LastName, Email, ProfilePicUrl })
+        .then(result => {
+            res.redirect('/userprofile')
+        })
+        .catch(error => {
+            res.render('errorpage', { message: error.message })
+        })
 
 })
 
@@ -455,44 +451,45 @@ app.post('/updateuserprofile', auth,(req, res) => {
 //----------------------------------
 // HOMEPAGE GET ROUTE
 //----------------------------------
-app.get('/', (_req,res) => {
+app.get('/', (_req, res) => {
     var products = []
     var categories = []
     var uniqueCategories = []
-      productsCollection.get()
-            .then(productSnap => {
-                productSnap.forEach(singleProduct => {
+    productsCollection.get()
+        .then(productSnap => {
+            productSnap.forEach(singleProduct => {
                     //store categories and products
                     categories.push(singleProduct.data().ProductCategory)
                     products.push(singleProduct)
                 })
                 //filter by unique categories
-                uniqueCategories = Array.from(new Set(categories))
+            uniqueCategories = Array.from(new Set(categories))
                 //console.log(uniqueCategories)
-                res.render('storefront',
-                {nav: 'storefront', 
-                fb: firebase, 
+            res.render('storefront', {
+                nav: 'storefront',
+                fb: firebase,
                 products,
-                uniqueCategories});
-            }) 
-            .catch (error => {
-                res.render('errorpage',{message : error.message})
-            })
-    
+                uniqueCategories
+            });
+        })
+        .catch(error => {
+            res.render('errorpage', { message: error.message })
+        })
 
 
-//----------------------------------
-// CONTACT PAGE GET ROUTE
-//----------------------------------
-app.get('/contact', (req, res) => {
-    res.render('main.handlebars',{nav: 'contact'});
-  });
 
-  //==========================================================
-  //nodemailer configuration starts..
-  //==========================================================
-  app.post('/send', (req, res) => {
-    const output = `
+    //----------------------------------
+    // CONTACT PAGE GET ROUTE
+    //----------------------------------
+    app.get('/contact', (req, res) => {
+        res.render('main.handlebars', { nav: 'contact' });
+    });
+
+    //==========================================================
+    //nodemailer configuration starts..
+    //==========================================================
+    app.post('/send', (req, res) => {
+        const output = `
       <p>You have a new contact request</p>
       <h3>Contact Details</h3>
       <ul>  
@@ -504,46 +501,46 @@ app.get('/contact', (req, res) => {
       <h3>Message</h3>
       <p>${req.body.message}</p>
     `;
-  
-    // create reusable transporter object using the default SMTP transport
-    let transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      
-      //port: 537 ,
-      //secure: false, // true for 465, false for other ports
-      auth: {
-          user: 'sumiayi@gmail.com', // generated ethereal user
-          pass: '987654321Ab'  // generated ethereal password
-      },
-      // tls:{
-      //   rejectUnauthorized:false
-      // }
-    });
-  
-    // setup email data with unicode symbols
-    let mailOptions = {
-        from: '"Nodemailer Contact" <sumiayi@gmail.com>', // sender address
-        to: 'priankasumia@yahoo.com', // list of receivers
-        subject: 'Node Contact Request', // Subject line
-        text: 'Hello world?', // plain text body
-        html: output // html body
-    };
-  
-    // send mail with defined transport object
-    transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-            return console.log(error);
-        }
-        console.log('Message sent: %s', info.messageId);   
-        console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
-  
-        res.render('main.handlebars', {msg:'Email has been sent'});
-    });
+
+        // create reusable transporter object using the default SMTP transport
+        let transporter = nodemailer.createTransport({
+            host: 'smtp.gmail.com',
+
+            //port: 537 ,
+            //secure: false, // true for 465, false for other ports
+            auth: {
+                user: 'sumiayi@gmail.com', // generated ethereal user
+                pass: '987654321Ab' // generated ethereal password
+            },
+            // tls:{
+            //   rejectUnauthorized:false
+            // }
+        });
+
+        // setup email data with unicode symbols
+        let mailOptions = {
+            from: '"Nodemailer Contact" <sumiayi@gmail.com>', // sender address
+            to: 'priankasumia@yahoo.com', // list of receivers
+            subject: 'Node Contact Request', // Subject line
+            text: 'Hello world?', // plain text body
+            html: output // html body
+        };
+
+        // send mail with defined transport object
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                return console.log(error);
+            }
+            console.log('Message sent: %s', info.messageId);
+            console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+
+            res.render('main.handlebars', { msg: 'Email has been sent' });
+        });
     });
     //==========================================================
     //NODEMAILER CONFIG. ENDS
     //==========================================================
-  })
+})
 
 
 
@@ -551,32 +548,67 @@ app.get('/contact', (req, res) => {
 //logout 
 //==========================================================
 app.get('/logout', (req, res) => {
-  firebase.auth().signOut()
-  .then (result => {
-    res.redirect('/');
-  })
-  .catch(error => {
-    res.send(error)
-  })
+    firebase.auth().signOut()
+        .then(result => {
+            res.redirect('/');
+        })
+        .catch(error => {
+            res.send(error)
+        })
 })
 
 //auth functions
 function auth(req, res, next) {
-  if (firebase.auth().currentUser) {
-      next()
-  } else {
-      res.render('errorPage', { message: "Unauthorized access! Login to access this page." })
-  }
+    if (firebase.auth().currentUser) {
+        next()
+    } else {
+        res.render('errorPage', { message: "Unauthorized access! Login to access this page." })
+    }
 }
 
 function adminAuth(req, res, next) {
-  if (firebase.auth().currentUser && isAdmin(firebase.auth().currentUser.email)) {
-      next()
-  } else {
-      res.render('errorPage', { message: "Unauthorized access! Privileged users only." })
-  }
+    if (firebase.auth().currentUser && isAdmin(firebase.auth().currentUser.email)) {
+        next()
+    } else {
+        res.render('errorPage', { message: "Unauthorized access! Privileged users only." })
+    }
 }
 
 function isAdmin(email) {
-  return email == "khoffmeister1@uco.edu" // || email == ""
+    return email == "khoffmeister1@uco.edu" // || email == ""
 }
+
+//======================================================
+//           CATEGORIES LINKS
+//======================================================
+app.get('/menTops', (req, res) => {
+    res.render('menTops');
+});
+
+app.get('/menBottoms', (req, res) => {
+    res.render('menBottoms');
+});
+
+app.get('/menFootwear', (req, res) => {
+    res.render('menFootwear');
+});
+
+app.get('/womenTops', (req, res) => {
+    res.render('womenTops');
+});
+
+app.get('/womenBottoms', (req, res) => {
+    res.render('womenBottoms');
+});
+
+app.get('/womenFootwear', (req, res) => {
+    res.render('womenFootwear');
+});
+
+//=======================================================
+//
+//========================================================
+
+app.get('/search', (req, res) => {
+    res.render('search');
+});
