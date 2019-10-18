@@ -12,7 +12,7 @@ const fs = require('fs')
 const utils = require('./utils.js')
 
 // Firebase initialization
-const serviceAccount = require("./serinde-dae45-firebase-adminsdk-z0zyl-40de77fbd0.json")
+const serviceAccount = require("./serinde-dae45-firebase-adminsdk-z0zyl-2c11c31be9.json")
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
     databaseURL: "https://serinde-dae45.firebaseio.com"
