@@ -1,106 +1,64 @@
-<!doctype html>
-
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
-    <link rel="stylesheet" type="text/css" href="../public/css/sellerprofile.css">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-
-    <title>Seller Page</title>
-
-    <link rel="stylesheet" href="css/styles.css?v=1.0">
-
+    <!--  This file has been downloaded from https://bootdey.com  -->
+    <!--  All snippets are MIT license https://bootdey.com/license -->
+  
+    <title>Serinde</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <link href="http://netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href='https://fonts.googleapis.com/css?family=Advent+Pro:300,700' rel='stylesheet' type='text/css' />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../public/css/userprofile.css">
 </head>
-
 <body>
-
-    <div class="container-fluid seller_profile">
-        <div class="row">
-            <div class="col-3  col_adjust left">
-                <div class="seller_center_column1">
-                    <!-- 1st third of the seller info list -->
-                    <div id="seller_profile_1">
-                        <a>
-                            <img src="https://bootdey.com/img/Content/avatar/avatar6.png" class="circle_photo img-responsive" src="#" alt="profile pic" height="200" ,
-                                width="200">
-                        </a>
-                        <div>
-                            <span>Seller Name</span>
-                            <br>
-                            <span>Review: 5 stars</span>
-                            <br>
-                            <br>
-                        </div>
-                    </div>
-                    <!-- 2nd third of seller info list -->
-                    <div id="seller_profile_2">
-                        <span>Company: Serinde</span>
-                        <br>
-                        <a href="#">
-                            Product List
-                        </a>
-                        <br>
-                        <a href="#">
-                            Add New Item
-                        </a>
-                        <br>
-                        <span>Location: OK, USA</span>
-                        <br>
-                        <br>
-                    </div>
-                    <!-- last third of seller info list -->
-                    <div>
-                        <a href="#">
-                            Edit Profile
-                        </a>
-                        <br>
-                        <a href= '/contact'>
-                            Contact Us
-                        </a>
-                    </div>
+        
+<br>
+<div class="col-md-12">  
+    <div class="col-md-4">      
+        <div class="portlet light profile-sidebar-portlet bordered">
+            <div class="profile-userpic">
+                <img src="https://bootdey.com/img/Content/avatar/avatar6.png" class="img-responsive" alt=""> </div>
+            <div class="profile-usertitle">
+                <div class="profile-usertitle-name"> <%= seller.data().FirstName %> </div>
+                <div class="profile-usertitle-job"> Seller </div>
+                <div class="profile-useretitle-email"> <%= seller.data().Email %></div>
+            </div>
+            <div class="profile-userbuttons">
+                <a href="/resetpassword" class="btn btn-primary">Reset Password</a>
+            </div>
+          
+        </div>
+    </div>
+    <div class="col-md-8"> 
+        <div class="portlet light bordered">
+            <div class="portlet-title tabbable-line">
+                <div class="caption caption-md">
+                    <i class="icon-globe theme-font hide"></i>
+                    <span class="caption-subject font-blue-madison bold uppercase">Your info</span>
                 </div>
             </div>
-            <div class="col-7 col_adjust right">
-                <div class="row right_side">
-                    <!-- center div inside a column -->
-                    <div class="mx-auto">
-                        <p class="seller_paragraph_text">
-                            Here are some of our products:
-                        </p>
-                        <br>
-                        <br>
-
-                        <div>
-                            <!-- code to show products will go here -->
-                        </div>
-                    </div>
-                </div>
-                <div class="row right_side">
-                    <!-- center div inside a column -->
-                    <div class="mx-auto">
-                        <p class="seller_paragraph_text">
-                            Got any questions or Concerns:
-                        </p>
-                        <br>
-                        <br>
-                        <div>
-                            <!-- Email form will go here -->
-                            
-                        
-                        </div>
-                    </div>
+            <div class="portlet-body">
+                <div>
+                        <% if(source.toString() === 'sellerproductUpdate'){ %> 
+                            <% include ./productUpdate %>
+                        <% } %>
+                        <%  if(source.toString() === 'sellerprofile'){ %>
+                            <% include ./sellerTabs %>
+                        <% } %>
+                               
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-
-
-
-
-        <script src="js/scripts.js"></script>
+<script src="http://netdna.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script type="text/javascript">
+	
+</script>
 </body>
-
 </html>

@@ -1,0 +1,115 @@
+                    <!-- Nav tabs -->
+                    <ul class="nav nav-tabs" role="tablist">
+
+                            <li role="presentation" ><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Profile</a></li>
+                            <li role="presentation"><a href="#editprofile" aria-controls="editprofile" role="tab" data-toggle="tab">Edit Profile</a></li>
+                            <li role="presentation" "<% if(source.toString() === 'sellerprofile#products'){%>"class="active" "<% } %>"><a href="#products" aria-controls="products" role="tab" data-toggle="tab">Products</a></li>
+                            <li role="presentation"><a href="#storestats" aria-controls="storestats" role="tab" data-toggle="tab">Statistics</a></li>
+    
+                        </ul>
+                    
+                        <!-- Tab panes -->
+                        <div class="tab-content">
+                            <div role="tabpanel" class="tab-pane active" id="home">Dashboard</div>
+                            <!-- Edit profile tab -->
+                            <div role="tabpanel" class="tab-pane" id="editprofile">
+                                
+                                    <form action='/updateuserprofile' method="POST">
+                                      <div class="form-group">
+                                        <label for="inputName">Name</label>
+                                        <input type="text" name="firstName" class="form-control" id="inputName" placeholder="<%= seller.data().FirstName %>" >
+                                      </div>
+                                        <div class="form-group">
+                                        <label for="inputLastName">Last Name</label>
+                                        <input type="text" name="lastName" class="form-control" id="inputLastName" placeholder="<%= seller.data().LastName %>" >
+                                      </div>
+                                      <div class="form-group">
+                                        <label for="exampleInputEmail1">Email address</label>
+                                        <input type="email" name="email" class="form-control" id="exampleInputEmail1" placeholder="<%= seller.data().Email %>" >
+                                      </div>
+                                      <div class="form-group">
+                                        <label for="exampleInputFile">Profile Pic</label>
+                                        <input type="file" id="exampleInputFile">
+                                        <p class="help-block">jpeg|jpg|png|gif</p>
+                                      </div>
+                                      
+                                      <button type="submit" class="btn btn-default">Submit</button>
+                                    </form>
+                            </div>
+                            <!-- Products tab -->
+                            <div role="tabpanel" class="tab-pane" id="products">
+                                  <h2>Products</h2>
+                                  <div class="text-center">
+                                      <% include ./modalProductAdd%>
+                                  </div>
+                                  <a href="/sellerprofile/productrefresh" class="btn btn-outline-secondary" role="button" ><i class="fa fa-refresh" aria-hidden="true"></i>&nbsp;Refresh</a>
+                                  <a href="" class="btn btn-outline-secondary" role="button" style="float: right" data-toggle="modal" data-target="#modalProductFormAdd"><i class="fa fa-plus"></i>Add</a>
+                                  <div class="table-responsive">
+                                    <table class="table table-striped table-sm">
+                                      <thead>
+                                        <tr>
+                                            <th scope="col">Image</th>
+                                            <th scope="col">Title</th>
+                                            <th scope="col">Price</th>
+                                            <th scope="col">Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <%products.forEach(product => {  %>
+                                        <tr>
+                                            <td>
+                                                <img src="/./public/images/<%=product.data().ProductImage %>" height="50" width="50">
+                                            </td>
+                                            <td>
+                                                <%= product.data().ProductTitle %>
+                                            </td>
+                                            <td>
+                                                    <%= utils.dollar.format(product.data().ProductPrice) %>
+                                            </td>
+                                            <td>
+                                                <%= product.data().ProductDescription %>
+                                            </td>
+                            
+                                            <td>
+                                                <div class="text-center">
+                                                     
+                                                        <a href="/sellerprofile/productupdate?_id=<%= product.id %>" class="btn btn-primary" role="button">EDIT</a>
+                                                </div>
+                                            </td>
+                                            <!--Delete button implementation -->
+                                            <td>
+                                              <!-- Button trigger modal -->
+                                              <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#exampleModal">REMOVE</button>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Delete conformation</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to remove <%= product.data().ProductTitle %>?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <form action="/sellerprofile/productdelete" method="POST">
+          <input type="hidden" name="id" value="<%= product.id %>">  
+          <button type="submit" class="btn btn-danger">REMOVE</button>            
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+                                            </td>
+                                        </tr>
+                                        <% }) %>
+                                    </tbody>
+                                    </table>
+                                  </div>
+                            </div>
+                            <div role="tabpanel" class="tab-pane" id="storestats"><p>Store Statistics</p></div>
+                        </div>

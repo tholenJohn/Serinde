@@ -1,0 +1,69 @@
+body {
+    margin: 0;
+}
+
+.container {
+    background-color: aqua;
+} 
+
+.left_column {
+    padding-top: 20px;
+    height: 95vh;
+}
+
+.left {
+    position: relative;
+    border: 1px solid skyblue;
+    height: 95vh;
+    margin-left: 25px;
+    column-gap: 2px;
+    overflow-y: scroll;
+}
+
+
+.right {
+    position: relative;
+    border: 1px solid skyblue;
+    margin-left: 1px;
+    height: 95vh;
+}
+
+.right_side {
+    position: relative;
+    border: 1px solid skyblue;
+    margin-left: 1px;
+    height: 47vh;
+}
+
+
+.seller_center_column1 {
+    text-align: center;
+}
+
+p .seller_paragraph_text {
+    color: #2c3e50;
+    padding-bottom: 10px;
+}
+
+
+.circle_photo {
+    border-radius: 50%;
+}
+
+/* ----------------------------------------------
+USED IN STOREFRONT PAGE
+   ----------------------------------------------
+*/ 
+
+h3 {
+    width: 100%;
+    height: 40px;
+}
+
+.card_row {
+    height: 200px;
+}
+
+.oneCard {
+    display: inline;
+}
