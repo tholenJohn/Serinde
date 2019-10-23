@@ -112,3 +112,16 @@ ul {
         text-align: left;
     }
 }
+
+
+/* BOOTSTRAP CARD ITEMS */
+
+div.card {
+    text-decoration: none;
+    border: 2px #CCC outset;
+    margin: 2em 0em 0em 1em;
+    width: 20em;
+}
+
+
+/* SEARCH BAR */

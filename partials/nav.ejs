@@ -17,23 +17,20 @@
 
             <a class="navbar-brand" href="/">Serinde</a>
 
-            <nav class="navbar navbar-light bg-light">
+            <nav class="navbar navbar-light ">
 
-                <!-- Search Bar-->
+                <!-- Search Box -->
 
-                <form class="form-inline">
-                    <input class="form-control mr-lg-10" type="search" placeholder="Search..." aria-label="Search" size="75">
+                <form class="form-inline my-2 my-lg-0">
+                    <input class="form-control mr-sm-2" style="width: 500px" type="search" placeholder="Search..." aria-label="Search">
                     <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
                 </form>
 
             </nav>
 
-            <!-- Contact Us-->
+            <!-- LOGIN -->
 
-            <li class="nav-item <%= nav == 'contact' ? 'active' : ''%>">
-                <a class="nav-link" href="/contact">Contact Us</a>
-            </li>
-            <% if (!login) { %>
+            <% if (!fb.auth().currentUser) { %>
                 <li class="login">
                     <a class="btn btn-primary" href="/login" role="button">Login</a>
                 </li>
@@ -41,8 +38,8 @@
                     <li class="dropdown">
                         <div class="dropdown">
                             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-								<%= email %>  
-								</button>
+                                    <%= fb.auth().currentUser.email %>  
+                                    </button>
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                 <a class="dropdown-item" href="/userprofile">User Profile</a>
                                 <a class="dropdown-item" href="/sellerprofile">Selling information</a>
