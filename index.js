@@ -103,6 +103,16 @@ app.post('/changeemail', auth, (req, res) => {
 
                 }
             })
+
+            sellers.get().then(sellersSnap=>{
+                sellersSnap.forEach(seller =>{
+                    if(seller.data().Email == oldEmail){
+                        var newData = seller.data()
+                        newData.Email = userEmail
+                        sellers.doc(seller.id).set(newData) // updating seller email to new email change
+                    }
+                })
+            })
         })
         .catch(error => {
             res.render('errorPage', { message: error.message })
