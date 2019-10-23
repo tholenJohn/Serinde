@@ -616,6 +616,19 @@ function isAdmin(email) {
     return email == "khoffmeister1@uco.edu" // || email == ""
 }
 
+//===================================================
+// SEARCH BAR SUBMIT BUTTON REDIRECT FUNCTION
+//===================================================
+
+function redirect() {
+    document.location.href = '/browse/' + document.getElementById('search').value;
+    return false;
+}
+
+app.get('/browse', (req, res) => {
+    res.render('search');
+});
+
 //======================================================
 //           CATEGORIES LINKS
 //======================================================
@@ -643,10 +656,30 @@ app.get('/womenFootwear', (req, res) => {
     res.render('womenFootwear');
 });
 
+app.get('/childrenTops', (req, res) => {
+    res.render('childrenTops');
+});
+
+app.get('/childrenBottoms', (req, res) => {
+    res.render('childrenBottoms');
+});
+
+app.get('/childrenFootwear', (req, res) => {
+    res.render('childrenFootwear');
+});
+
+app.get('/bodyLotionsAndCreams', (req, res) => {
+    res.render('bodyLotionsAndCreams');
+});
+
+app.get('/facialCleansers', (req, res) => {
+    res.render('facialCleansers');
+});
+
+app.get('/facialTreatments', (req, res) => {
+    res.render('facialTreatments');
+});
+
 //=======================================================
 //
-//========================================================
-
-app.get('/search', (req, res) => {
-    res.render('search');
-});
+//=======================================================
