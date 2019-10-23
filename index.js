@@ -630,6 +630,19 @@ app.get('/childrenFootwear', (req, res) => {
     res.render('childrenFootwear');
 });
 
+app.get('/babiesTops', (req, res) => {
+    res.render('babiesTops');
+});
+
+app.get('/babiesBottoms', (req, res) => {
+    res.render('babiesBottoms');
+});
+
+app.get('/babiesFootwear', (req, res) => {
+    res.render('babiesFootwear');
+});
+
+
 app.get('/bodyLotionsAndCreams', (req, res) => {
     res.render('bodyLotionsAndCreams');
 });
@@ -642,6 +655,29 @@ app.get('/facialTreatments', (req, res) => {
     res.render('facialTreatments');
 });
 
+app.get('/shampooAndConditioners', (req, res) => {
+    res.render('shampooAndConditioners');
+});
+
+app.get('/hairTreatments', (req, res) => {
+    res.render('hairTreatments');
+});
+
+app.get('/stylingTools', (req, res) => {
+    res.render('stylingTools');
+});
+
+app.get('/laptopComputers', (req, res) => {
+    res.render('laptopComputers');
+});
+
+app.get('/desktopComputers', (req, res) => {
+    res.render('desktopComputers');
+});
+
+app.get('/cellPhonesAndAccessories', (req, res) => {
+    res.render('cellPhonesAndAccessories');
+});
 //=======================================================
 //
 //=======================================================
