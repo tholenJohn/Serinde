@@ -10,6 +10,12 @@ const nodemailer = require('nodemailer')
 const session = require('express-session')
 const fs = require('fs')
 const utils = require('./utils.js')
+var {Storage} = require('@google-cloud/storage')
+const storage = new Storage({
+    projectId: 'serinde-dae45',
+    keyFilename: 'serinde-dae45-firebase-adminsdk-z0zyl-2c11c31be9.json'
+});
+
 
 // Firebase initialization
 const serviceAccount = require("./serinde-dae45-firebase-adminsdk-z0zyl-2c11c31be9.json")
@@ -32,8 +38,6 @@ const firebaseConfig = {
     appId: "1:460955537577:web:720cc9e7ba3436077319b8"
 };
 firebase.initializeApp(firebaseConfig);
-
-
 
 //All local imports
 app.set('view engine', 'handlebars');
@@ -394,7 +398,15 @@ app.post('/sellerprofile/productadd', (req, res) => {
         } else if (!req.file) {
             return res.render('errorpage', { message: 'No file selected'});
         }
-        // how to get sellerid from email
+    
+        //this code uploads the picture to firebase storage
+        /*
+        storage.bucket('gs://serinde-dae45.appspot.com').upload('./'+req.file.path)
+        .catch(error=>{
+            return res.render('errorpage', { message: error.message});
+        })
+        //then we need to delete it form local folder
+        */
         
         sellers.get().then(sellersSnap=>{
             sellersSnap.forEach(seller =>{
@@ -407,6 +419,7 @@ app.post('/sellerprofile/productadd', (req, res) => {
                         ProductTitle: req.body.title,
                         SellerId : seller.id
                     }
+
             
                     productsCollection.doc().set(data)
                         .then(result => {
