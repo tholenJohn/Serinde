@@ -526,12 +526,22 @@ app.get('/', (_req, res) => {
                 //filter by unique categories
             uniqueCategories = Array.from(new Set(categories))
                 //console.log(uniqueCategories)
-            res.render('storefront', {
-                nav: 'storefront',
-                fb: firebase,
-                products,
-                uniqueCategories
-            });
+
+            if(isAdmin(firebase.auth().currentUser.email)){// rendering different homepage for admins
+                res.render('adminstorefront', {
+                    nav: 'adminstorefront',
+                    fb: firebase,
+                    products,
+                    uniqueCategories
+                });
+            }else{
+                res.render('storefront', {
+                    nav: 'storefront',
+                    fb: firebase,
+                    products,
+                    uniqueCategories
+                });
+            }
         })
         .catch(error => {
             res.render('errorpage', { message: error.message })

@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <%- include ../partials/header %>
+        <link rel="stylesheet" type="text/css" href="../public/css/storefront.css">
+        <link rel="stylesheet" href="css/styles.css?v=1.0">
+        <title>ADMIN HOME</title>
+
+</head>
+
+<body>
+
+    <% include ../partials/navadmin %>
+
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-3 column-1">
+
+                    <!-- Category should be listed here -->
+                    <div class="vertical-menu left-menu">
+                        <a href="#" class="active"><i class="fa fa-bars"></i> Categories</a>
+
+                        <ul class="mainmenu">
+                            <li><a href="">Men's Fashion</a>
+                                <ul class="submenu">
+                                    <li><a href="/menTops">Tops</a></li>
+                                    <li><a href="/menBottoms">Bottoms</a></li>
+                                    <li><a href="/menFootwear">Footwear</a></li>
+                                </ul>
+                            </li>
+
+                            <li><a href="">Women's Fashion</a>
+                                <ul class="submenu">
+                                    <li><a href="/womenTops">Tops</a></li>
+                                    <li><a href="/womenBottoms">Bottoms</a></li>
+                                    <li><a href="/womenFootwear">Footwear</a></li>
+                                </ul>
+                            </li>
+
+                            <li><a href="">Children's Fashion</a>
+                                <ul class="submenu">
+                                    <li><a href="/childrenTops">Tops</a></li>
+                                    <li><a href="/childrenBottoms">Bottoms</a></li>
+                                    <li><a href="/childrenFootwear">Footwear</a></li>
+                                </ul>
+                            </li>
+
+                            <li><a href="">Babies</a>
+                                <ul class="submenu">
+                                    <li><a href="">Tops</a></li>
+                                    <li><a href="">Bottoms</a></li>
+                                    <li><a href="">Footwear</a></li>
+                                </ul>
+                            </li>
+
+                            <li><a href="">Skin Care Products</a>
+                                <ul class="submenu">
+                                    <li><a href="/bodyLotionsAndCreams">Body Lotions & Creams</a></li>
+                                    <li><a href="/facialCleansers">Facial Cleansers </a></li>
+                                    <li><a href="/facialTreatments">Facial Treatments</a></li>
+                                </ul>
+                            </li>
+
+                            <li><a href="">Hair Care Products</a>
+                                <ul class="submenu">
+                                    <li><a href="">Shampoo & Conditioners</a></li>
+                                    <li><a href="">Hair Treatments</a></li>
+                                    <li><a href="">Styling Tools</a></li>
+                                </ul>
+                            </li>
+
+                            <li><a href="">Electronics</a>
+                                <ul class="submenu">
+                                    <li><a href="">Laptops Computers</a></li>
+                                    <li><a href="">Desktop Computers</a></li>
+                                    <li><a href="">Cell phones & Accessories</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- END col-3 column END -->
+
+                <div class="col-7" style="border: 3px solid brown">
+                    <div class="column-2">
+                        <% for(let i = 0; i < uniqueCategories.length; i++) { %>
+                            <div class="row">
+                                <h3>
+                                    <%= uniqueCategories[i] %>
+                                </h3>
+                                <hr>
+                                <!-- slidable row of random 10 items of this category loaded into 10 cards -->
+                                <div class="row-config">
+                                    <% products.forEach(product => { %>
+                                        <% if (product.data().ProductCategory === uniqueCategories[i]) { %>
+                                            <div class="oneCard each-card">
+                                                <div class="card" style="width: 18rem;">
+                                                    <img class="img-config" class="card_row" class="card-img-top" src="/./public/images/<%=product.data().ProductImage %>" alt="Missing Image">
+                                                    <div class="card-body">
+                                                        <h5 class="card-title">
+                                                            <a href="#" class="card-link">
+                                                                <%= product.data().ProductTitle %>
+                                                            </a>
+                                                        </h5>
+                                                        <p class="card-text desc-limit">
+                                                            <%= product.data().ProductDescription %>
+                                                        </p>
+                                                        <a href="#" class="card-link">Add to Cart</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <% } %>
+                                                <% }) %>
+                                </div>
+                            </div>
+                            <%   } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <%- include ../partials/scripts %>
+
+            <!-- Contact Us-->
+
+            <footer class="border-top footer text-muted">
+                <div class="container">
+                    <div class="nav-item <%= nav == 'contact' ? 'active' : ''%>">
+                        <a class="nav-link" href="/contact">Contact Us</a>
+                    </div>
+                    &copy; 2019 - Serinde
+                </div>
+            </footer>
+
+</body>
+
+</html>
