@@ -109,7 +109,14 @@
                                                         <p class="card-text desc-limit">
                                                             <%= product.data().ProductDescription %>
                                                         </p>
-                                                        <a href="#" class="card-link">Add to Cart</a>
+
+                                                        <form action='/add2cart' method="POST">
+                                                            <input type="hidden" name="id" value="<%= product.id %>">
+                                                            <input type="hidden" name="title" value="<%= product.data().ProductTitle %>">
+                                                            <input type="hidden" name="price" value="<%= product.data().ProductPrice %>">
+                                                            <input type="hidden" name="image" value="<%= product.data().ProductImage %>">
+                                                            <a href="#" onclick="this.parentNode.submit()" class="btn btn-outline-secondary">Add To Cart</a>
+                                                        </form>
                                                     </div>
                                                 </div>
                                             </div>
