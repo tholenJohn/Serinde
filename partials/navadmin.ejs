@@ -15,7 +15,7 @@
 
         <ul class="navbar-nav">
 
-            <a class="navbar-brand" href="/">Serinde</a>
+            <a class="navbar-brand" href="/">ADMIN HOME</a>
 
             <nav class="navbar navbar-light ">
 
@@ -37,7 +37,7 @@
                 <% } else { %>
                     <li class="dropdown">
                         <div class="dropdown">
-                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <button class="btn btn-warning dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <%= fb.auth().currentUser.email %>  
                                     </button>
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -47,12 +47,11 @@
                             </div>
                         </div>
                     </li>
+                    <div>
+                        <a class="btn btn-danger" href="/adminusers" role="button">USERS</a>
+                        <a class="btn btn-danger" href="/adminproducts" role="button">PRODUCTS</a>
+                    </div>
                     <% } %>
-            <div>
-                <a class="btn btn-danger" href="/adminusers" role="button">USERS</a>
-                <a class="btn btn-danger" href="/adminproducts" role="button">PRODUCTS</a>
-            </div>
-            
         </ul>
 
     </div>

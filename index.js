@@ -527,23 +527,25 @@ app.get('/', (_req, res) => {
             uniqueCategories = Array.from(new Set(categories))
                 //console.log(uniqueCategories)
 
-            if(isAdmin(firebase.auth().currentUser.email)){// rendering different homepage for admins
+            if(firebase.auth().currentUser){// rendering different homepage for admins
+                if(isAdmin(firebase.auth().currentUser.email)){
                 res.render('adminstorefront', {
                     nav: 'adminstorefront',
                     fb: firebase,
                     products,
                     uniqueCategories
                 });
-            }else{
+              }
+            }
                 res.render('storefront', {
                     nav: 'storefront',
                     fb: firebase,
                     products,
                     uniqueCategories
                 });
-            }
         })
         .catch(error => {
+            console.log('????')
             res.render('errorpage', { message: error.message })
         })
 
@@ -648,6 +650,18 @@ function adminAuth(req, res, next) {
 function isAdmin(email) {
     return email == "khoffmeister1@uco.edu" // || email == ""
 }
+
+//===================================================
+// ADMIN GET ROUTES
+//===================================================
+
+app.get('/adminproducts', adminAuth, (req,res)=>{
+
+})
+
+app.get('/adminusers', adminAuth, (req,res)=>{
+
+})
 
 //===================================================
 // SEARCH BAR SUBMIT BUTTON REDIRECT FUNCTION
