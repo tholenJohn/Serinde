@@ -252,15 +252,27 @@ const imageUpload = multer({
 app.post('/sellerprofilesetup', auth, (req,res)=>{
     const CompanyLocation = req.body.clocation
     const CompanyName = req.body.cname 
-    
-    sellers.doc().set({
-        Email : firebase.auth().currentUser.email,
-        CompanyName,
-        CompanyLocation,
-        ProfilePicUrl : ""
+
+    sellers.get().then(sellersSnap=>{
+        var found = false
+        sellersSnap.forEach(seller =>{
+            if(firebase.auth().currentUser.email== seller.data().Email){
+               found = true
+            } 
+      })
+      if(!found){
+        sellers.doc().set({
+            Email : firebase.auth().currentUser.email,
+            CompanyName,
+            CompanyLocation,
+            ProfilePicUrl : ""
+         }).then(result =>{
+            return res.redirect('/sellerprofile')
+         })
+      }
     })
 
-    res.redirect('/sellerprofile')
+    
 })
 
 //----------------------------------
@@ -423,10 +435,10 @@ app.post('/sellerprofile/productadd', (req, res) => {
             
                     productsCollection.doc().set(data)
                         .then(result => {
-                            res.redirect('/sellerprofile')
+                            return res.redirect('/sellerprofile')
                         })
                         .catch(error => {
-                            res.render('errorPage', {
+                            return res.render('errorPage', {
                                 source: '/sellerprofile#products',
                                 error
                             });
