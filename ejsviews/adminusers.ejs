@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <% include ../partials/header %>
+  <title>ADMIN HOME</title>
+</head>
+
+<body>
+        <h1>ADMIN <span class="badge badge-secondary">USERS</span></h1>
+    <div class="jumbotron">
+        <a href="/" class="btn btn-danger">Back</a>
+        <ul class="list-group list-group-flush">
+            <%users.forEach(user=>{%>
+                
+                    <li class="list-group-item"><%=user.data().Email%>   <%=user.data().LastName%>, <%=user.data().FirstName%>   <%=user.data().Location%>
+                        <form action="/adminuserreset" method="POST">
+                         <input type="hidden" name="email" value="<%=user.data().Email%>">
+                            </br>
+                         <button type="submit" class="btn btn-warning">Send password reset email</button>
+                        </form> 
+                        <form action="/adminuserdelete" method="POST">
+                            <input type="hidden" name="email" value="<%=user.data().Email%>">
+                               </br>
+                            <button type="submit" class="btn btn-danger">DELETE</button>
+                        </form> 
+                    </li>
+                
+            <%})%>
+        </ul>
+    </div>
+  <% include ../partials/scripts %>
+</body>
+
+</html>

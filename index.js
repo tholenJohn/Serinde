@@ -656,11 +656,47 @@ function isAdmin(email) {
 //===================================================
 
 app.get('/adminproducts', adminAuth, (req,res)=>{
-
+    
 })
 
 app.get('/adminusers', adminAuth, (req,res)=>{
+    users.get().then(usersSnapshot =>{
+        res.render('adminusers', {users: usersSnapshot}) // sending users to EJS
+    })
+})
 
+app.post('/adminuserreset', adminAuth, (req,res)=>{
+    const email = req.body.email
+    firebase.auth().sendPasswordResetEmail(email).then(result=>{
+        res.redirect('/adminusers')
+    }).catch(error=>{
+        res.render('errorpage', {message : error.message})
+    })
+})
+
+app.post('/adminuserdelete', adminAuth, (req,res)=>{
+    const email = req.body.email
+    admin.auth().getUserByEmail(email).then(user=>{
+        sellers.get().then(sellersSnapshot=>{
+            sellersSnapshot.forEach(seller=>{
+                if(seller.data().Email == email){
+                    products.get().then(productSnapshot=>{
+                        productSnapshot.forEach(product=>{
+                            if(products.data().SellerId == seller.id){
+                                products.doc(product.id).delete()
+                            }
+                        })
+                    }).then(result=>{
+                        sellers.doc(seller.id).delete().then(result=>{
+                            users.doc(email).delete()
+                        })
+                    })
+                }
+            })
+        })
+    }).then(result=>{
+        res.redirect('/adminusers')
+    })
 })
 
 //===================================================
