@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href='https://fonts.googleapis.com/css?family=Advent+Pro:300,700' rel='stylesheet' type='text/css' />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- plugin: fancybox  -->
+    <script src="../plugins/fancybox/fancybox.min.js" type="text/javascript"></script>
+    <link href="../plugins/fancybox/fancybox.min.css" type="text/css" rel="stylesheet">
+
+    <!-- custom style -->
+    <link href="../css/ui.css?v=1.0" rel="stylesheet" type="text/css" />
+    <link href="../css/responsive.css" rel="stylesheet" media="only screen and (max-width: 1200px)" />
+
+    <!-- custom javascript -->
+    <script src="../js/script.js" type="text/javascript"></script>
+
+    <script>
+        $('.btn-number').click(function(e) {
+            e.preventDefault();
+
+            fieldName = $(this).attr('data-field');
+            type = $(this).attr('data-type');
+            var input = $("input[name='" + fieldName + "']");
+            var currentVal = parseInt(input.val());
+            if (!isNaN(currentVal)) {
+                if (type == 'minus') {
+
+                    if (currentVal > input.attr('min')) {
+                        input.val(currentVal - 1).change();
+                    }
+                    if (parseInt(input.val()) == input.attr('min')) {
+                        $(this).attr('disabled', true);
+                    }
+
+                } else if (type == 'plus') {
+
+                    if (currentVal < input.attr('max')) {
+                        input.val(currentVal + 1).change();
+                    }
+                    if (parseInt(input.val()) == input.attr('max')) {
+                        $(this).attr('disabled', true);
+                    }
+
+                }
+            } else {
+                input.val(0);
+            }
+        });
+        $('.input-number').focusin(function() {
+            $(this).data('oldValue', $(this).val());
+        });
+        $('.input-number').change(function() {
+
+            minValue = parseInt($(this).attr('min'));
+            maxValue = parseInt($(this).attr('max'));
+            valueCurrent = parseInt($(this).val());
+
+            name = $(this).attr('name');
+            if (valueCurrent >= minValue) {
+                $(".btn-number[data-type='minus'][data-field='" + name + "']").removeAttr('disabled')
+            } else {
+                alert('Sorry, the minimum value was reached');
+                $(this).val($(this).data('oldValue'));
+            }
+            if (valueCurrent <= maxValue) {
+                $(".btn-number[data-type='plus'][data-field='" + name + "']").removeAttr('disabled')
+            } else {
+                alert('Sorry, the maximum value was reached');
+                $(this).val($(this).data('oldValue'));
+            }
+
+
+        });
+        $(".input-number").keydown(function(e) {
+            // Allow: backspace, delete, tab, escape, enter and .
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 190]) !== -1 ||
+                // Allow: Ctrl+A
+                (e.keyCode == 65 && e.ctrlKey === true) ||
+                // Allow: home, end, left, right
+                (e.keyCode >= 35 && e.keyCode <= 39)) {
+                // let it happen, don't do anything
+                return;
+            }
+            // Ensure that it is a number and stop the keypress
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
+    </script>
+
+
+</head>
+
+<body>
+    <header class="section-header">
+        <section class="header-main">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-3 col-sm-4">
+                        <div class="brand-wrap">
+                            <h2 class="logo-text">Serinde</h2>
+                        </div>
+                        <!-- brand-wrap.// -->
+                    </div>
+                    <div class="col-lg-6 col-sm-8">
+                        <form action="#" class="search-wrap">
+                            <div class="input-group w-100">
+                                <input type="text" class="form-control" style="width:45%;" placeholder="Search">
+                                <select class="custom-select" name="category_name">
+                                    <option value="">All categories</option><option value="codex">Men</option>
+                                    <option value="comments">Women</option>
+                                    <option value="content">Children</option>
+                                    <option value="content">Babies</option>
+                                    <option value="content">Skin Care Products</option>
+                                    <option value="content">Hair Care Products</option>
+                                    <option value="content">Electronics</option>
+                            </select>
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary" type="submit">
+                                <i class="fa fa-search"></i>
+                              </button>
+                                </div>
+                            </div>
+                        </form>
+                        <!-- search-wrap .end// -->
+                    </div>
+                    <!-- col.// -->
+
+                </div>
+                <!-- row.// -->
+            </div>
+            <!-- container.// -->
+        </section>
+        <!-- header-main .// -->
+    </header>
+    <!-- section-header.// -->
+
+
+    <!-- ========================= SECTION CONTENT ========================= -->
+    <section class="section-content bg padding-y border-top">
+        <div class="container">
+            <% if (sc.items.length == 0) { %>
+                <h3> Your cart is empty !</h3>
+                <% } else { %>
+                    <div class="row">
+                        <main class="col-sm-9">
+
+
+                            <div class="card">
+                                <table class="table table-hover shopping-cart-wrap">
+                                    <thead class="text-muted">
+
+                                        <tr>
+                                            <th scope="col">Product</th>
+                                            <th scope="col" width="140">Quantity</th>
+                                            <th scope="col" width="120">Price</th>
+                                            <th scope="col" class="text-right" width="200">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        <% for (const item of sc.items) { %>
+                                            <tr>
+                                                <td>
+                                                    <figure class="media">
+                                                        <div class="img-wrap"><img src="../public/images/<%=item.product.image %>" class="img-thumbnail img-xs" height="160" width="160"></div>
+
+                                                        <figcaption class="media-body">
+                                                            <h6 class="title text-truncate">
+                                                                <%= item.product.title %>
+                                                            </h6>
+                                                        </figcaption>
+                                                    </figure>
+                                                </td>
+                                                <td>
+                                                    <div class="input-group">
+                                                        <span class="input-group-btn">
+                                    <button type="button" class="btn btn-danger btn-number"  data-type="minus" data-field="quant[2]">
+                                    <i class="fa fa-minus fa-xs" aria-hidden="true"></i>
+                                </button>
+                            </span>
+                                                        <input type="text" name="quant[2]" class="form-control input-number" value="<%= item.qty %>" min="1" max="100">
+                                                        <span class="input-group-btn">
+                                    <button type="button" class="btn btn-success btn-number" data-type="plus" data-field="quant[2]">
+                                        <i class="fa fa-plus fa-xs" aria-hidden="true"></i>
+                                </button>
+                            </span>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="price-wrap">
+                                                        <var class="price"><%= utils.dollar.format(item.product.price * item.qty) %> </var>
+                                                        <small class="text-muted">(<%= utils.dollar.format(item.product.price) %>  each)</small>
+                                                    </div>
+                                                    <!-- price-wrap .// -->
+                                                </td>
+                                                <td class="text-right">
+                                                    <form action='/removeFromCart' method="POST">
+                                                        <input type="hidden" name="id" value="<%= item.product.id %>">
+                                                        <a href="#" onclick="this.parentNode.submit()" class="btn btn-outline-danger"> × Remove</a>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                            <% } %>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                            <!-- card.// -->
+
+                        </main>
+                        <!-- col.// -->
+                        <aside class="col-sm-3">
+
+                            <dl class="dlist-align">
+                                <dt>Total price: </dt>
+                                <dd class="text-right">
+                                    <%= utils.dollar.format(sc.getTotal()) %>
+                                </dd>
+                            </dl>
+                            <dl class="dlist-align">
+                                <dt>Tax:</dt>
+                                <dd class="text-right">
+                                    <%= utils.dollar.format(sc.getTotal() * 0.086) %>
+                                </dd>
+                            </dl>
+                            <dl class="dlist-align h4">
+                                <dt>Total:</dt>
+                                <dd class="text-right"><strong><%= utils.dollar.format(sc.getTotal() + (sc.getTotal() * 0.086)) %></strong></dd>
+                            </dl>
+                            <hr>
+                            <center>
+                                <a href="" class="btn btn-primary btn-round">PROCEED TO CHECKOUT</a>
+                            </center>
+                        </aside>
+                        <!-- col.// -->
+                    </div>
+                    <% } %>
+        </div>
+        <!-- container .//  -->
+    </section>
+    <!-- ========================= SECTION CONTENT END// ========================= -->
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+
+
+</body>
+
+
+</html>
