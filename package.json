@@ -28,6 +28,7 @@
     "firebase": "^6.6.2",
     "firebase-admin": "^8.6.0",
     "fs": "0.0.1-security",
+    "generate-password": "^1.4.2",
     "multer": "^1.4.2",
     "nodemailer": "^6.3.0",
     "nodemon": "^1.19.2"

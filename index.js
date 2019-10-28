@@ -266,33 +266,20 @@ app.post('/sellerprofilesetup', auth, (req, res) => {
     const CompanyLocation = req.body.clocation
     const CompanyName = req.body.cname 
 
-    sellers.get().then(sellersSnap=>{
-        var found = false
-        sellersSnap.forEach(seller =>{
-            if(firebase.auth().currentUser.email== seller.data().Email){
-               found = true
-            } 
-      })
-      if(!found){
-        sellers.doc().set({
-            Email : firebase.auth().currentUser.email,
-            CompanyName,
-            CompanyLocation,
-            ProfilePicUrl : ""
-         }).then(result =>{
-            return res.redirect('/sellerprofile')
-         })
-      }
+    sellers.doc().set({
+        Email : firebase.auth().currentUser.email,
+        CompanyName,
+        CompanyLocation,
+        ProfilePicUrl : ""
+    }).then(result=>{
+        res.redirect('/sellerprofile')
     })
-
-    
 })
 
 //----------------------------------
 // SELLERPAGE GET ROUTE
 //----------------------------------
 
-//Lifting auth for easy testing
 app.get('/sellerprofile', auth, (req, res) => {
     //get products, seller info 
     //check if the user has a seller profile
@@ -614,14 +601,26 @@ app.get('/', (_req, res) => {
                 //filter by unique categories
             uniqueCategories = Array.from(new Set(categories))
                 //console.log(uniqueCategories)
-            res.render('storefront', {
-                nav: 'storefront',
-                fb: firebase,
-                products,
-                uniqueCategories
-            });
+
+            if(firebase.auth().currentUser){// rendering different homepage for admins
+                if(isAdmin(firebase.auth().currentUser.email)){
+                res.render('adminstorefront', {
+                    nav: 'adminstorefront',
+                    fb: firebase,
+                    products,
+                    uniqueCategories
+                });
+              }
+            }
+                res.render('storefront', {
+                    nav: 'storefront',
+                    fb: firebase,
+                    products,
+                    uniqueCategories
+                });
         })
         .catch(error => {
+            console.log('????')
             res.render('errorpage', { message: error.message })
         })
 
@@ -726,6 +725,56 @@ function adminAuth(req, res, next) {
 function isAdmin(email) {
     return email == "khoffmeister1@uco.edu" // || email == ""
 }
+
+//===================================================
+// ADMIN GET ROUTES
+//===================================================
+
+app.get('/adminproducts', adminAuth, (req,res)=>{
+    
+})
+
+app.get('/adminusers', adminAuth, (req,res)=>{
+    users.get().then(usersSnapshot =>{
+        res.render('adminusers', {users: usersSnapshot}) // sending users to EJS
+    })
+})
+
+app.post('/adminuserreset', adminAuth, (req,res)=>{
+    const email = req.body.email
+    firebase.auth().sendPasswordResetEmail(email).then(result=>{
+        res.redirect('/adminusers')
+    }).catch(error=>{
+        res.render('errorpage', {message : error.message})
+    })
+})
+
+app.post('/adminuserdelete', adminAuth, (req,res)=>{
+
+    const email = req.body.email
+
+    admin.auth().getUserByEmail(email).then(user=>{
+        sellers.get().then(sellersSnapshot=>{
+            sellersSnapshot.forEach(seller=>{
+                if(seller.data().Email == email){
+                    productsCollection.get().then(productSnapshot=>{
+                        productSnapshot.forEach(product=>{
+                            if(product.data().SellerId == seller.id){
+                                productsCollection.doc(product.id).delete()
+                            }
+                        })
+                    })
+                    sellers.doc(seller.id).delete().then(result=>{
+                        admin.auth().deleteUser(user.uid).then(result=>{
+                            users.doc(email).delete()
+                            res.redirect('/adminusers')
+                        })
+                    })
+                }
+            })
+        })
+    })
+})
 
 //===================================================
 // SEARCH BAR SUBMIT BUTTON REDIRECT FUNCTION
