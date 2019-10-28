@@ -10,6 +10,13 @@ const nodemailer = require('nodemailer')
 const session = require('express-session')
 const fs = require('fs')
 const utils = require('./utils.js')
+var {Storage} = require('@google-cloud/storage')
+const storage = new Storage({
+    projectId: 'serinde-dae45',
+    keyFilename: 'serinde-dae45-firebase-adminsdk-z0zyl-2c11c31be9.json'
+});
+
+const ShoppingCart = require('./models/ShoppingCart.js');
 
 // Firebase initialization
 const serviceAccount = require("./serinde-dae45-firebase-adminsdk-z0zyl-2c11c31be9.json")
@@ -33,8 +40,6 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 
-
-
 //All local imports
 app.set('view engine', 'handlebars');
 app.engine('handlebars', exphbs());
@@ -55,6 +60,18 @@ const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {
     console.log(`Server is running at port ${PORT}`)
 })
+
+//----------------------------------
+// SESSION
+//----------------------------------
+app.use(session({
+    secret: 'mysupersecretcode!!@#@#!A',
+    saveUnitialized: false,
+    resave: false,
+    cookie: {
+        maxAge: 1000 * 60 * 60 * 24
+    }
+}));
 
 
 //----------------------------------
@@ -77,7 +94,7 @@ app.get('/changeemail', auth, (req, res) => {
 app.post('/changeemail', auth, (req, res) => {
     const oldEmail = firebase.auth().currentUser.email
     const userEmail = req.body.email
-    if(oldEmail == userEmail){
+    if (oldEmail == userEmail) {
         return res.redirect('/userprofile')
     }
     firebase.auth().currentUser.updateEmail(userEmail)
@@ -102,6 +119,16 @@ app.post('/changeemail', auth, (req, res) => {
                         }) // creating another doc with the same data
 
                 }
+            })
+
+            sellers.get().then(sellersSnap=>{
+                sellersSnap.forEach(seller =>{
+                    if(seller.data().Email == oldEmail){
+                        var newData = seller.data()
+                        newData.Email = userEmail
+                        sellers.doc(seller.id).set(newData) // updating seller email to new email change
+                    }
+                })
             })
         })
         .catch(error => {
@@ -235,18 +262,30 @@ const imageUpload = multer({
 // SELLERPAGESETUP POST ROUTE
 //----------------------------------
 
-app.post('/sellerprofilesetup', auth, (req,res)=>{
+app.post('/sellerprofilesetup', auth, (req, res) => {
     const CompanyLocation = req.body.clocation
     const CompanyName = req.body.cname 
-    
-    sellers.doc().set({
-        Email : firebase.auth().currentUser.email,
-        CompanyName,
-        CompanyLocation,
-        ProfilePicUrl : ""
+
+    sellers.get().then(sellersSnap=>{
+        var found = false
+        sellersSnap.forEach(seller =>{
+            if(firebase.auth().currentUser.email== seller.data().Email){
+               found = true
+            } 
+      })
+      if(!found){
+        sellers.doc().set({
+            Email : firebase.auth().currentUser.email,
+            CompanyName,
+            CompanyLocation,
+            ProfilePicUrl : ""
+         }).then(result =>{
+            return res.redirect('/sellerprofile')
+         })
+      }
     })
 
-    res.redirect('/sellerprofile')
+    
 })
 
 //----------------------------------
@@ -257,18 +296,18 @@ app.post('/sellerprofilesetup', auth, (req,res)=>{
 app.get('/sellerprofile', auth, (req, res) => {
     //get products, seller info 
     //check if the user has a seller profile
-    sellers.get().then(sellersSnap=>{
+    sellers.get().then(sellersSnap => {
         var found = false
-        sellersSnap.forEach(seller =>{
-            if(firebase.auth().currentUser.email == seller.data().Email){
+        sellersSnap.forEach(seller => {
+            if (firebase.auth().currentUser.email == seller.data().Email) {
                 found = true
-                //user has a seller profile set up so we render normally with their info
+                    //user has a seller profile set up so we render normally with their info
                 var products = []
                 productsCollection.get().then(productSnap => {
                     productSnap.forEach(product => {
-                        if(product.data().SellerId == seller.id){ // each of their products is displayed
+                        if (product.data().SellerId == seller.id) { // each of their products is displayed
                             products.push(product)
-                            //console.log(product.data())
+                                //console.log(product.data())
                         }
                     })
                     return res.render('sellerprofile', {
@@ -276,14 +315,14 @@ app.get('/sellerprofile', auth, (req, res) => {
                         seller,
                         utils,
                         source: 'sellerprofile'
-                   })
+                    })
                 })
             }
         })
-        if(!found){
+        if (!found) {
             return res.render('sellerprofilesetup')
         }
-    }).catch(error=>{
+    }).catch(error => {
         res.render('errorPage', { message: error })
     })
 
@@ -292,21 +331,21 @@ app.get('/sellerprofile', auth, (req, res) => {
 app.get('/sellerprofile/productupdate', (req, res) => {
     const _id = req.query._id;
 
-    sellers.get().then(sellersSnap=>{
-        sellersSnap.forEach(seller =>{
-            if(firebase.auth().currentUser.email == seller.data().Email){
-            productsCollection.doc(_id).get()
-                .then(product => {
-                    res.render('sellerprofile', {
-                        product,
-                        utils,
-                        seller,
-                        source: 'sellerproductUpdate'
+    sellers.get().then(sellersSnap => {
+        sellersSnap.forEach(seller => {
+            if (firebase.auth().currentUser.email == seller.data().Email) {
+                productsCollection.doc(_id).get()
+                    .then(product => {
+                        res.render('sellerprofile', {
+                            product,
+                            utils,
+                            seller,
+                            source: 'sellerproductUpdate'
+                        })
                     })
-                })
-                .catch(error => {
-                    res.render('errorPage', { message: error })
-                })
+                    .catch(error => {
+                        res.render('errorPage', { message: error })
+                    })
             }
         })
     })
@@ -319,59 +358,59 @@ app.post('/sellerprofile/productupdate', (req, res) => {
             return res.render('errorpage', { message: error })
         } else if (!req.file) {
             //return res.render('errorpage', {message: "File not found!"})
-            sellers.get().then(sellersSnap=>{
-                sellersSnap.forEach(seller =>{
-                    if(firebase.auth().currentUser.email == seller.data().Email){
-            const productId = req.body.id;
-            let data = {
-                ProductCategory: req.body.category,
-                ProductDescription: req.body.description,
-                ProductImage: req.body.productImage,
-                ProductPrice: req.body.price,
-                ProductTitle: req.body.title,
-                SellerId: seller.id
-            }
+            sellers.get().then(sellersSnap => {
+                sellersSnap.forEach(seller => {
+                    if (firebase.auth().currentUser.email == seller.data().Email) {
+                        const productId = req.body.id;
+                        let data = {
+                            ProductCategory: req.body.category,
+                            ProductDescription: req.body.description,
+                            ProductImage: req.body.productImage,
+                            ProductPrice: req.body.price,
+                            ProductTitle: req.body.title,
+                            SellerId: seller.id
+                        }
 
-            productsCollection.doc(productId).set(data)
-                .then(result => {
-                    res.redirect('/sellerprofile')
+                        productsCollection.doc(productId).set(data)
+                            .then(result => {
+                                res.redirect('/sellerprofile')
+                            })
+                            .catch(error => {
+                                res.render('errorPage', {
+                                    source: '/sellerprofile#products',
+                                    error
+                                });
+                            })
+                    }
                 })
-                .catch(error => {
-                    res.render('errorPage', {
-                        source: '/sellerprofile#products',
-                        error
-                    });
-                })
-            }
-        })
-    })
+            })
         } else {
-            sellers.get().then(sellersSnap=>{
-                sellersSnap.forEach(seller =>{
-                    if(firebase.auth().currentUser.email == seller.data().Email){
-            const productId = req.body.id;
-            let data = {
-                ProductCategory: req.body.category,
-                ProductDescription: req.body.description,
-                ProductImage: req.file.filename,
-                ProductPrice: req.body.price,
-                ProductTitle: req.body.title,
-                SellerId: seller.id
-            }
+            sellers.get().then(sellersSnap => {
+                sellersSnap.forEach(seller => {
+                    if (firebase.auth().currentUser.email == seller.data().Email) {
+                        const productId = req.body.id;
+                        let data = {
+                            ProductCategory: req.body.category,
+                            ProductDescription: req.body.description,
+                            ProductImage: req.file.filename,
+                            ProductPrice: req.body.price,
+                            ProductTitle: req.body.title,
+                            SellerId: seller.id
+                        }
 
-            productsCollection.doc(productId).set(data)
-                .then(result => {
-                    res.redirect('/sellerprofile')
+                        productsCollection.doc(productId).set(data)
+                            .then(result => {
+                                res.redirect('/sellerprofile')
+                            })
+                            .catch(error => {
+                                res.render('errorPage', {
+                                    source: '/sellerprofile#products',
+                                    error
+                                });
+                            })
+                    }
                 })
-                .catch(error => {
-                    res.render('errorPage', {
-                        source: '/sellerprofile#products',
-                        error
-                    });
-                })
-            }
-        })
-    })
+            })
         }
     })
 })
@@ -382,9 +421,17 @@ app.post('/sellerprofile/productadd', (req, res) => {
         if (error) {
             return res.render('errorpage', { message: error })
         } else if (!req.file) {
-            return res.render('errorpage', { message: 'No file selected'});
+            return res.render('errorpage', { message: 'No file selected' });
         }
-        // how to get sellerid from email
+    
+        //this code uploads the picture to firebase storage
+        /*
+        storage.bucket('gs://serinde-dae45.appspot.com').upload('./'+req.file.path)
+        .catch(error=>{
+            return res.render('errorpage', { message: error.message});
+        })
+        //then we need to delete it form local folder
+        */
         
         sellers.get().then(sellersSnap=>{
             sellersSnap.forEach(seller =>{
@@ -395,15 +442,15 @@ app.post('/sellerprofile/productadd', (req, res) => {
                         ProductImage: req.file.filename,
                         ProductPrice: req.body.price,
                         ProductTitle: req.body.title,
-                        SellerId : seller.id
+                        SellerId: seller.id
                     }
-            
+
                     productsCollection.doc().set(data)
                         .then(result => {
-                            res.redirect('/sellerprofile')
+                            return res.redirect('/sellerprofile')
                         })
                         .catch(error => {
-                            res.render('errorPage', {
+                            return res.render('errorPage', {
                                 source: '/sellerprofile#products',
                                 error
                             });
@@ -411,7 +458,7 @@ app.post('/sellerprofile/productadd', (req, res) => {
                 }
             })
         })
-        
+
     })
 })
 
@@ -484,6 +531,70 @@ app.post('/updateuserprofile', auth, (req, res) => {
 
 })
 
+
+//----------------------------------
+//SHOPING CART
+//----------------------------------
+app.post('/add2cart', (req, res) => {
+
+    let sc;
+    if (!req.session.sc) {
+        sc = new ShoppingCart();
+    } else {
+        sc = ShoppingCart.deserialize(req.session.sc)
+    }
+
+    const id = req.body.id;
+    const title = req.body.title;
+    const price = req.body.price;
+    const image = req.body.image;
+    sc.add({
+        id,
+        title,
+        price,
+        image
+    });
+
+    req.session.sc = sc.serialize();
+
+    res.redirect('/cart');
+})
+
+app.post('/removeFromCart', (req, res) => {
+
+    let sc;
+
+    sc = ShoppingCart.deserialize(req.session.sc)
+
+
+    const id = req.body.id;
+    sc.remove({
+        id
+    });
+
+    req.session.sc = sc.serialize();
+
+    res.redirect('/cart');
+})
+
+
+
+
+app.get('/cart', (req, res) => {
+
+    let sc;
+    if (!req.session.sc) {
+        sc = new ShoppingCart();
+    } else {
+        sc = ShoppingCart.deserialize(req.session.sc)
+    }
+
+    res.render('cart', {
+        nav: 'cart',
+        sc,
+        utils
+    });
+})
 
 
 //----------------------------------
@@ -628,58 +739,3 @@ function redirect() {
 app.get('/browse', (req, res) => {
     res.render('search');
 });
-
-//======================================================
-//           CATEGORIES LINKS
-//======================================================
-app.get('/menTops', (req, res) => {
-    res.render('menTops');
-});
-
-app.get('/menBottoms', (req, res) => {
-    res.render('menBottoms');
-});
-
-app.get('/menFootwear', (req, res) => {
-    res.render('menFootwear');
-});
-
-app.get('/womenTops', (req, res) => {
-    res.render('womenTops');
-});
-
-app.get('/womenBottoms', (req, res) => {
-    res.render('womenBottoms');
-});
-
-app.get('/womenFootwear', (req, res) => {
-    res.render('womenFootwear');
-});
-
-app.get('/childrenTops', (req, res) => {
-    res.render('childrenTops');
-});
-
-app.get('/childrenBottoms', (req, res) => {
-    res.render('childrenBottoms');
-});
-
-app.get('/childrenFootwear', (req, res) => {
-    res.render('childrenFootwear');
-});
-
-app.get('/bodyLotionsAndCreams', (req, res) => {
-    res.render('bodyLotionsAndCreams');
-});
-
-app.get('/facialCleansers', (req, res) => {
-    res.render('facialCleansers');
-});
-
-app.get('/facialTreatments', (req, res) => {
-    res.render('facialTreatments');
-});
-
-//=======================================================
-//
-//=======================================================
