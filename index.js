@@ -67,7 +67,7 @@ app.listen(PORT, () => {
 
 app.use(session({
     secret: 'mysupersecretcode!!@#@#!A',
-    saveUnitialized: false,
+    saveUninitialized: false,
     resave: false,
     cookie: {
         maxAge: 1000 * 60 * 60 * 24
