@@ -258,16 +258,15 @@ app.post('/sellerprofilesetup', auth, (req,res)=>{
         CompanyName,
         CompanyLocation,
         ProfilePicUrl : ""
+    }).then(result=>{
+        res.redirect('/sellerprofile')
     })
-
-    res.redirect('/sellerprofile')
 })
 
 //----------------------------------
 // SELLERPAGE GET ROUTE
 //----------------------------------
 
-//Lifting auth for easy testing
 app.get('/sellerprofile', auth, (req, res) => {
     //get products, seller info 
     //check if the user has a seller profile
@@ -675,27 +674,29 @@ app.post('/adminuserreset', adminAuth, (req,res)=>{
 })
 
 app.post('/adminuserdelete', adminAuth, (req,res)=>{
+
     const email = req.body.email
+
     admin.auth().getUserByEmail(email).then(user=>{
         sellers.get().then(sellersSnapshot=>{
             sellersSnapshot.forEach(seller=>{
                 if(seller.data().Email == email){
-                    products.get().then(productSnapshot=>{
+                    productsCollection.get().then(productSnapshot=>{
                         productSnapshot.forEach(product=>{
-                            if(products.data().SellerId == seller.id){
-                                products.doc(product.id).delete()
+                            if(product.data().SellerId == seller.id){
+                                productsCollection.doc(product.id).delete()
                             }
                         })
-                    }).then(result=>{
-                        sellers.doc(seller.id).delete().then(result=>{
+                    })
+                    sellers.doc(seller.id).delete().then(result=>{
+                        admin.auth().deleteUser(user.uid).then(result=>{
                             users.doc(email).delete()
+                            res.redirect('/adminusers')
                         })
                     })
                 }
             })
         })
-    }).then(result=>{
-        res.redirect('/adminusers')
     })
 })
 
