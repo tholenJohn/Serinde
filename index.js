@@ -7,7 +7,7 @@ const bodyParser = require('body-parser')
 const exphbs = require('express-handlebars')
 const pa = require('path')
 const nodemailer = require('nodemailer')
-//const session = require('express-session')
+const session = require('express-session')
 const fs = require('fs')
 const utils = require('./utils.js')
 var {Storage} = require('@google-cloud/storage')
@@ -64,7 +64,7 @@ app.listen(PORT, () => {
 //----------------------------------
 // SESSION
 //----------------------------------
-/*
+
 app.use(session({
     secret: 'mysupersecretcode!!@#@#!A',
     saveUnitialized: false,
@@ -73,7 +73,7 @@ app.use(session({
         maxAge: 1000 * 60 * 60 * 24
     }
 }));
-*/
+
 
 
 //----------------------------------
