@@ -1,6 +1,5 @@
 body {
-    margin: 3em 3em 3em 3em;
-    padding-top: 2em;
+    margin: 0;
     background-color: #f9feff;
     font-size: 15px;
 }
@@ -22,7 +21,9 @@ h3 {
     color: #8B4513;
 }
 
-.column-2 {}
+.column-2 {
+
+}
 
 .row-config {
     display: flex;
@@ -32,40 +33,17 @@ h3 {
 
 .each-card {
     padding: 5px;
+    
 }
 
 .img-config {
     height: 200px;
 }
 
+
 .desc-limit {
     display: block;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-}
-
-
-/* Sticky footer styles
--------------------------------------------------- */
-
-html {
-    position: relative;
-    min-height: 100%;
-}
-
-body {
-    /* Margin bottom by footer height */
-    margin-bottom: 60px;
-}
-
-.footer {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    white-space: nowrap;
-    /* Set the fixed height of the footer here */
-    height: 40px;
-    line-height: 40px;
-    /* Vertically center the text there */
 }
