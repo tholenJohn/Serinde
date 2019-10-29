@@ -51,9 +51,9 @@
 
                             <li><a href="">Babies' Fashion</a>
                                 <ul class="submenu">
-                                    <li><a href="">Tops</a></li>
-                                    <li><a href="">Bottoms</a></li>
-                                    <li><a href="">Footwear</a></li>
+                                    <li><a href="/babiesTops">Tops</a></li>
+                                    <li><a href="/babiesBottoms">Bottoms</a></li>
+                                    <li><a href="/babiesFootwear">Footwear</a></li>
                                 </ul>
                             </li>
 
@@ -67,17 +67,17 @@
 
                             <li><a href="">Hair Care Products</a>
                                 <ul class="submenu">
-                                    <li><a href="">Shampoo & Conditioners</a></li>
-                                    <li><a href="">Hair Treatments</a></li>
-                                    <li><a href="">Styling Tools</a></li>
+                                    <li><a href="/shampooAndConditioners">Shampoo & Conditioners</a></li>
+                                    <li><a href="/hairTreatments">Hair Treatments</a></li>
+                                    <li><a href="/stylingTools">Styling Tools</a></li>
                                 </ul>
                             </li>
 
                             <li><a href="">Electronics</a>
                                 <ul class="submenu">
-                                    <li><a href="">Laptops Computers</a></li>
-                                    <li><a href="">Desktop Computers</a></li>
-                                    <li><a href="">Cell phones & Accessories</a></li>
+                                    <li><a href="/laptopComputers">Laptop Computers</a></li>
+                                    <li><a href="/desktopComputers">Desktop Computers</a></li>
+                                    <li><a href="/cellPhonesAndAccessories">Cell phones & Accessories</a></li>
                                 </ul>
                             </li>
                         </ul>
@@ -109,7 +109,14 @@
                                                         <p class="card-text desc-limit">
                                                             <%= product.data().ProductDescription %>
                                                         </p>
-                                                        <a href="#" class="card-link">Add to Cart</a>
+
+                                                        <form action='/add2cart' method="POST">
+                                                            <input type="hidden" name="id" value="<%= product.id %>">
+                                                            <input type="hidden" name="title" value="<%= product.data().ProductTitle %>">
+                                                            <input type="hidden" name="price" value="<%= product.data().ProductPrice %>">
+                                                            <input type="hidden" name="image" value="<%= product.data().ProductImage %>">
+                                                            <a href="#" onclick="this.parentNode.submit()" class="btn btn-outline-secondary">Add To Cart</a>
+                                                        </form>
                                                     </div>
                                                 </div>
                                             </div>
