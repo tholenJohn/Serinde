@@ -455,7 +455,6 @@ app.post('/sellerprofile/productdelete', (req, res) => {
 //----------------------------------
 app.get('/userprofile', (req, res) => {
     const userEmail = firebase.auth().currentUser.email
-    console.log(userEmail)
     users.doc(userEmail).get().then(doc => {
         var data = doc.data()
         res.render('userprofile', { data })
@@ -468,20 +467,29 @@ app.get('/userprofile', (req, res) => {
 //----------------------------------
 app.post('/updateuserprofile', auth, (req, res) => {
 
-    const sellerid = "GGoWWB8HPBaTMJw4eGU3";
-    const Email = req.body.email;
-    const FirstName = req.body.firstName;
-    const LastName = req.body.lastName;
-    const ProfilePicUrl = ""
+    imageUpload(req, res, error => {
+        if (error) {
+            return res.render('errorpage', { message: error })
+        } else if (!req.file) {
+            return res.render('errorpage', { message: 'No file selected'})
+        }
+    
 
-    sellers.doc(sellerid).set({ FirstName, LastName, Email, ProfilePicUrl })
-        .then(result => {
-            res.redirect('/userprofile')
-        })
-        .catch(error => {
-            res.render('errorpage', { message: error.message })
-        })
-
+    
+        const userEmail = firebase.auth().currentUser.email
+        const ProfilePicUrl = req.file.filename;
+        const FirstName = req.body.firstName;
+        const LastName = req.body.lastName;
+        const Location = req.body.location;
+        
+        users.doc(userEmail).set({ FirstName, LastName, Location, ProfilePicUrl })
+            .then(result => {
+                res.redirect('/userprofile')
+            })
+            .catch(error => {
+                res.render('errorpage', { message: error.message })
+            })
+    })
 })
 
 
@@ -581,6 +589,18 @@ app.get('/', (_req, res) => {
 })
 
 
+app.get('/productdetail', (req, res) => {
+    const productId = req.query._id 
+    productsCollection.doc(productId).get()
+    .then(product => {
+        res.render('productdetail', {product, utils})
+    })
+    .catch(error => {
+        res.render('errorpage', { message: error.message })
+    })
+})
+
+
 
 //==========================================================
 //logout 
@@ -616,19 +636,6 @@ function isAdmin(email) {
     return email == "khoffmeister1@uco.edu" // || email == ""
 }
 
-//===================================================
-// SEARCH BAR SUBMIT BUTTON REDIRECT FUNCTION
-//===================================================
-
-function redirect() {
-    document.location.href = '/browse/' + document.getElementById('search').value;
-    return false;
-}
-
-app.get('/browse', (req, res) => {
-    res.render('search');
-});
-
 //======================================================
 //           CATEGORIES LINKS
 //======================================================
@@ -656,30 +663,10 @@ app.get('/womenFootwear', (req, res) => {
     res.render('womenFootwear');
 });
 
-app.get('/childrenTops', (req, res) => {
-    res.render('childrenTops');
-});
-
-app.get('/childrenBottoms', (req, res) => {
-    res.render('childrenBottoms');
-});
-
-app.get('/childrenFootwear', (req, res) => {
-    res.render('childrenFootwear');
-});
-
-app.get('/bodyLotionsAndCreams', (req, res) => {
-    res.render('bodyLotionsAndCreams');
-});
-
-app.get('/facialCleansers', (req, res) => {
-    res.render('facialCleansers');
-});
-
-app.get('/facialTreatments', (req, res) => {
-    res.render('facialTreatments');
-});
-
 //=======================================================
 //
-//=======================================================
+//========================================================
+
+app.get('/search', (req, res) => {
+    res.render('search');
+});
