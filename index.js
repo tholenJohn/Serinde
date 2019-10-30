@@ -1,8 +1,11 @@
+
+
 // All npm imports
 const express = require('express')
 var admin = require('firebase-admin')
 const firebase = require('firebase')
 const app = express()
+const stripe = require('stripe')('pk_test_DuPogbGVY05NnsWipp3M3eCm001AB993JZ')
 const bodyParser = require('body-parser')
 const exphbs = require('express-handlebars')
 const pa = require('path')
@@ -48,8 +51,8 @@ app.set('views', './ejsviews');
 app.use('/public', express.static(pa.join(__dirname + '/public')));
 
 
-app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
 
 //----------------------------------
@@ -591,6 +594,24 @@ app.get('/cart', (req, res) => {
         sc,
         utils
     });
+})
+
+
+//----------------------------------
+// CHARGE CREDIT CARD GET ROUTE
+//----------------------------------
+app.post('/charge', (req,res) => {
+    const amount = 10;
+
+    //create the customer that paid and render success page
+    stripe.customers.create({
+        email: req.body.stripeEmail,
+        source: req.body.stripeToken
+    }) 
+    .then(customer => stripe.charges.create({
+        customer: customer.id
+    }))
+    .then(res.render('success'))
 })
 
 
