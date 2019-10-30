@@ -16,10 +16,10 @@
 
     <% include ../partials/nav %>
 
-        <div class="container-fluid">
+
+        <div class="container-fluid ">
             <div class="row">
                 <div class="col-3 column-1">
-
                     <!-- Category should be listed here -->
                     <div class="vertical-menu left-menu">
                         <a href="#" class="active"><i class="fa fa-bars"></i> Categories</a>
@@ -43,13 +43,13 @@
 
                             <li><a href="">Children's Fashion</a>
                                 <ul class="submenu">
-                                    <li><a href="/childrenTops">Tops</a></li>
-                                    <li><a href="/childrenBottoms">Bottoms</a></li>
-                                    <li><a href="/childrenFootwear">Footwear</a></li>
+                                    <li><a href="">Tops</a></li>
+                                    <li><a href="">Bottoms</a></li>
+                                    <li><a href="">Footwear</a></li>
                                 </ul>
                             </li>
 
-                            <li><a href="">Babies</a>
+                            <li><a href="">Babies' Fashion</a>
                                 <ul class="submenu">
                                     <li><a href="/babiesTops">Tops</a></li>
                                     <li><a href="/babiesBottoms">Bottoms</a></li>
@@ -59,9 +59,9 @@
 
                             <li><a href="">Skin Care Products</a>
                                 <ul class="submenu">
-                                    <li><a href="/bodyLotionsAndCreams">Body Lotions & Creams</a></li>
-                                    <li><a href="/facialCleansers">Facial Cleansers </a></li>
-                                    <li><a href="/facialTreatments">Facial Treatments</a></li>
+                                    <li><a href="">Body Lotion & Creams</a></li>
+                                    <li><a href="">Facial Cleansers </a></li>
+                                    <li><a href="">Facial Treatments</a></li>
                                 </ul>
                             </li>
 
@@ -102,7 +102,7 @@
                                                     <img class="img-config" class="card_row" class="card-img-top" src="/./public/images/<%=product.data().ProductImage %>" alt="Missing Image">
                                                     <div class="card-body">
                                                         <h5 class="card-title">
-                                                            <a href="#" class="card-link">
+                                                            <a href="/productdetail?_id=<%= product.id %>" class="card-link" role="button">
                                                                 <%= product.data().ProductTitle %>
                                                             </a>
                                                         </h5>
@@ -121,7 +121,7 @@
                                                 </div>
                                             </div>
                                             <% } %>
-                                                <% }) %>
+                                        <% }) %>
                                 </div>
                             </div>
                             <%   } %>
@@ -131,18 +131,6 @@
         </div>
 
         <%- include ../partials/scripts %>
-
-            <!-- Contact Us-->
-
-            <footer class="border-top footer text-muted">
-                <div class="container">
-                    <div class="nav-item <%= nav == 'contact' ? 'active' : ''%>">
-                        <a class="nav-link" href="/contact">Contact Us</a>
-                    </div>
-                    &copy; 2019 - Serinde
-                </div>
-            </footer>
-
 </body>
 
 </html>

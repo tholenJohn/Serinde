@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <% include ../partials/header %>
+  <title>ADMIN HOME</title>
+</head>
+
+<body>
+        <h1>ADMIN <span class="badge badge-secondary">USERS</span></h1>
+    <div class="jumbotron">
+        <a href="/" class="btn btn-danger">Back</a>
+        <table class="table table-striped table-dark">
+                <thead>
+                  <tr>
+                    <th scope="col">Email</th>
+                    <th scope="col">First Name</th>
+                    <th scope="col">Last Name</th>
+                    <th scope="col">Location</th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <%users.forEach(user=>{%>
+                    <tr>
+                        <td><%=user.data().Email%></td>
+                        <td><%=user.data().FirstName%></td>
+                        <td><%=user.data().LastName%></td>
+                        <td><%=user.data().Location%></td>
+                        <td>
+                            <form action="/adminuserreset" method="POST">
+                                <input type="hidden" name="email" value="<%=user.data().Email%>">
+                                   </br>
+                                <button type="submit" class="btn btn-warning">Send password reset email</button>
+                            </form> 
+                        </td>
+                        <td>
+                            <form action="/adminuserdelete" method="POST">
+                                <input type="hidden" name="email" value="<%=user.data().Email%>">
+                                   </br>
+                                <button type="submit" class="btn btn-danger">DELETE</button>
+                            </form> 
+                        </td>
+                    </tr>
+                  <%})%>
+                </tbody>
+              </table>
+    </div>
+  <% include ../partials/scripts %>
+</body>
+
+</html>

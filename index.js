@@ -10,6 +10,12 @@ const nodemailer = require('nodemailer')
 const session = require('express-session')
 const fs = require('fs')
 const utils = require('./utils.js')
+var {Storage} = require('@google-cloud/storage')
+const storage = new Storage({
+    projectId: 'serinde-dae45',
+    keyFilename: 'serinde-dae45-firebase-adminsdk-z0zyl-2c11c31be9.json'
+});
+
 const ShoppingCart = require('./models/ShoppingCart.js');
 
 // Firebase initialization
@@ -33,8 +39,6 @@ const firebaseConfig = {
     appId: "1:460955537577:web:720cc9e7ba3436077319b8"
 };
 firebase.initializeApp(firebaseConfig);
-
-
 
 //All local imports
 app.set('view engine', 'handlebars');
@@ -60,14 +64,16 @@ app.listen(PORT, () => {
 //----------------------------------
 // SESSION
 //----------------------------------
+
 app.use(session({
     secret: 'mysupersecretcode!!@#@#!A',
-    saveUnitialized: false,
+    saveUninitialized: false,
     resave: false,
     cookie: {
         maxAge: 1000 * 60 * 60 * 24
     }
 }));
+
 
 
 //----------------------------------
@@ -115,6 +121,16 @@ app.post('/changeemail', auth, (req, res) => {
                         }) // creating another doc with the same data
 
                 }
+            })
+
+            sellers.get().then(sellersSnap=>{
+                sellersSnap.forEach(seller =>{
+                    if(seller.data().Email == oldEmail){
+                        var newData = seller.data()
+                        newData.Email = userEmail
+                        sellers.doc(seller.id).set(newData) // updating seller email to new email change
+                    }
+                })
             })
         })
         .catch(error => {
@@ -250,23 +266,22 @@ const imageUpload = multer({
 
 app.post('/sellerprofilesetup', auth, (req, res) => {
     const CompanyLocation = req.body.clocation
-    const CompanyName = req.body.cname
+    const CompanyName = req.body.cname 
 
     sellers.doc().set({
-        Email: firebase.auth().currentUser.email,
+        Email : firebase.auth().currentUser.email,
         CompanyName,
         CompanyLocation,
-        ProfilePicUrl: ""
+        ProfilePicUrl : ""
+    }).then(result=>{
+        res.redirect('/sellerprofile')
     })
-
-    res.redirect('/sellerprofile')
 })
 
 //----------------------------------
 // SELLERPAGE GET ROUTE
 //----------------------------------
 
-//Lifting auth for easy testing
 app.get('/sellerprofile', auth, (req, res) => {
     //get products, seller info 
     //check if the user has a seller profile
@@ -397,11 +412,19 @@ app.post('/sellerprofile/productadd', (req, res) => {
         } else if (!req.file) {
             return res.render('errorpage', { message: 'No file selected' });
         }
-        // how to get sellerid from email
-
-        sellers.get().then(sellersSnap => {
-            sellersSnap.forEach(seller => {
-                if (firebase.auth().currentUser.email == seller.data().Email) {
+    
+        //this code uploads the picture to firebase storage
+        /*
+        storage.bucket('gs://serinde-dae45.appspot.com').upload('./'+req.file.path)
+        .catch(error=>{
+            return res.render('errorpage', { message: error.message});
+        })
+        //then we need to delete it form local folder
+        */
+        
+        sellers.get().then(sellersSnap=>{
+            sellersSnap.forEach(seller =>{
+                if(firebase.auth().currentUser.email == seller.data().Email){
                     let data = {
                         ProductCategory: req.body.category,
                         ProductDescription: req.body.description,
@@ -413,10 +436,10 @@ app.post('/sellerprofile/productadd', (req, res) => {
 
                     productsCollection.doc().set(data)
                         .then(result => {
-                            res.redirect('/sellerprofile')
+                            return res.redirect('/sellerprofile')
                         })
                         .catch(error => {
-                            res.render('errorPage', {
+                            return res.render('errorPage', {
                                 source: '/sellerprofile#products',
                                 error
                             });
@@ -468,7 +491,6 @@ app.post('/sellerprofile/productdelete', (req, res) => {
 //----------------------------------
 app.get('/userprofile', (req, res) => {
     const userEmail = firebase.auth().currentUser.email
-    console.log(userEmail)
     users.doc(userEmail).get().then(doc => {
         var data = doc.data()
         res.render('userprofile', { data })
@@ -481,20 +503,29 @@ app.get('/userprofile', (req, res) => {
 //----------------------------------
 app.post('/updateuserprofile', auth, (req, res) => {
 
-    const sellerid = "GGoWWB8HPBaTMJw4eGU3";
-    const Email = req.body.email;
-    const FirstName = req.body.firstName;
-    const LastName = req.body.lastName;
-    const ProfilePicUrl = ""
+    imageUpload(req, res, error => {
+        if (error) {
+            return res.render('errorpage', { message: error })
+        } else if (!req.file) {
+            return res.render('errorpage', { message: 'No file selected'})
+        }
+    
 
-    sellers.doc(sellerid).set({ FirstName, LastName, Email, ProfilePicUrl })
-        .then(result => {
-            res.redirect('/userprofile')
-        })
-        .catch(error => {
-            res.render('errorpage', { message: error.message })
-        })
-
+    
+        const userEmail = firebase.auth().currentUser.email
+        const ProfilePicUrl = req.file.filename;
+        const FirstName = req.body.firstName;
+        const LastName = req.body.lastName;
+        const Location = req.body.location;
+        
+        users.doc(userEmail).set({ FirstName, LastName, Location, ProfilePicUrl })
+            .then(result => {
+                res.redirect('/userprofile')
+            })
+            .catch(error => {
+                res.render('errorpage', { message: error.message })
+            })
+    })
 })
 
 
@@ -580,14 +611,26 @@ app.get('/', (_req, res) => {
                 //filter by unique categories
             uniqueCategories = Array.from(new Set(categories))
                 //console.log(uniqueCategories)
-            res.render('storefront', {
-                nav: 'storefront',
-                fb: firebase,
-                products,
-                uniqueCategories
-            });
+
+            if(firebase.auth().currentUser){// rendering different homepage for admins
+                if(isAdmin(firebase.auth().currentUser.email)){
+                res.render('adminstorefront', {
+                    nav: 'adminstorefront',
+                    fb: firebase,
+                    products,
+                    uniqueCategories
+                });
+              }
+            }
+                res.render('storefront', {
+                    nav: 'storefront',
+                    fb: firebase,
+                    products,
+                    uniqueCategories
+                });
         })
         .catch(error => {
+            console.log('????')
             res.render('errorpage', { message: error.message })
         })
 
@@ -658,6 +701,18 @@ app.get('/', (_req, res) => {
 })
 
 
+app.get('/productdetail', (req, res) => {
+    const productId = req.query._id 
+    productsCollection.doc(productId).get()
+    .then(product => {
+        res.render('productdetail', {product, utils})
+    })
+    .catch(error => {
+        res.render('errorpage', { message: error.message })
+    })
+})
+
+
 
 //==========================================================
 //logout 
@@ -692,6 +747,56 @@ function adminAuth(req, res, next) {
 function isAdmin(email) {
     return email == "khoffmeister1@uco.edu" // || email == ""
 }
+
+//===================================================
+// ADMIN GET ROUTES
+//===================================================
+
+app.get('/adminproducts', adminAuth, (req,res)=>{
+    
+})
+
+app.get('/adminusers', adminAuth, (req,res)=>{
+    users.get().then(usersSnapshot =>{
+        res.render('adminusers', {users: usersSnapshot}) // sending users to EJS
+    })
+})
+
+app.post('/adminuserreset', adminAuth, (req,res)=>{
+    const email = req.body.email
+    firebase.auth().sendPasswordResetEmail(email).then(result=>{
+        res.redirect('/adminusers')
+    }).catch(error=>{
+        res.render('errorpage', {message : error.message})
+    })
+})
+
+app.post('/adminuserdelete', adminAuth, (req,res)=>{
+
+    const email = req.body.email
+
+    admin.auth().getUserByEmail(email).then(user=>{
+        sellers.get().then(sellersSnapshot=>{
+            sellersSnapshot.forEach(seller=>{
+                if(seller.data().Email == email){
+                    productsCollection.get().then(productSnapshot=>{
+                        productSnapshot.forEach(product=>{
+                            if(product.data().SellerId == seller.id){
+                                productsCollection.doc(product.id).delete()
+                            }
+                        })
+                    })
+                    sellers.doc(seller.id).delete().then(result=>{
+                        admin.auth().deleteUser(user.uid).then(result=>{
+                            users.doc(email).delete()
+                            res.redirect('/adminusers')
+                        })
+                    })
+                }
+            })
+        })
+    })
+})
 
 //===================================================
 // SEARCH BAR SUBMIT BUTTON REDIRECT FUNCTION
