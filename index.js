@@ -100,7 +100,7 @@ app.post('/changeemail', auth, (req, res) => {
     const oldEmail = firebase.auth().currentUser.email
     const userEmail = req.body.email
     if (oldEmail == userEmail) {
-        return res.redirect('/userprofile')
+        return res.redirect('/userprofile', {nav: 'storefront', fb: firebase})
     }
     firebase.auth().currentUser.updateEmail(userEmail)
         .then(result => {
@@ -119,7 +119,7 @@ app.post('/changeemail', auth, (req, res) => {
                             users.doc(oldEmail).delete() // deleting old email document
                             users.doc(userEmail).get().then(doc => { // getting new information to send to profile
                                 data = doc.data()
-                                res.render('userprofile', { data })
+                                res.render('userprofile', { data,nav: 'userprofile', fb: firebase })
                             })
                         }) // creating another doc with the same data
 
@@ -306,7 +306,9 @@ app.get('/sellerprofile', auth, (req, res) => {
                         products,
                         seller,
                         utils,
-                        source: 'sellerprofile'
+                        source: 'sellerprofile',
+                        nav:'storefront',
+                        fb: firebase
                     })
                 })
             }
@@ -496,7 +498,7 @@ app.get('/userprofile', (req, res) => {
     const userEmail = firebase.auth().currentUser.email
     users.doc(userEmail).get().then(doc => {
         var data = doc.data()
-        res.render('userprofile', { data })
+        res.render('userprofile', { data, nav: 'storefront', fb: firebase })
     })
 })
 
@@ -558,7 +560,7 @@ app.post('/add2cart', (req, res) => {
     req.session.sc = sc.serialize();
 
     res.redirect('/cart');
-})
+}) 
 
 app.post('/removeFromCart', (req, res) => {
 
@@ -592,7 +594,8 @@ app.get('/cart', (req, res) => {
     res.render('cart', {
         nav: 'cart',
         sc,
-        utils
+        utils,
+        fb: firebase
     });
 })
 
@@ -613,7 +616,6 @@ app.post('/charge', (req,res) => {
     }))
     .then(res.render('success'))
 })
-
 
 //----------------------------------
 // HOMEPAGE GET ROUTE
@@ -661,7 +663,7 @@ app.get('/', (_req, res) => {
     // CONTACT PAGE GET ROUTE
     //----------------------------------
     app.get('/contact', (req, res) => {
-        res.render('main.handlebars', { nav: 'contact' });
+        res.render('main.handlebars', { nav: 'storefront', fb: firebase });
     });
 
     //==========================================================
@@ -726,10 +728,10 @@ app.get('/productdetail', (req, res) => {
     const productId = req.query._id 
     productsCollection.doc(productId).get()
     .then(product => {
-        res.render('productdetail', {product, utils})
+        res.render('productdetail', {product, utils, fb: firebase, nav:'storefront'})
     })
     .catch(error => {
-        res.render('errorpage', { message: error.message })
+        res.render('errorpage', { message: error.message, fb: firebase, nav: 'storefront' })
     })
 })
 
@@ -779,7 +781,7 @@ app.get('/adminproducts', adminAuth, (req,res)=>{
 
 app.get('/adminusers', adminAuth, (req,res)=>{
     users.get().then(usersSnapshot =>{
-        res.render('adminusers', {users: usersSnapshot}) // sending users to EJS
+        res.render('adminusers', {users: usersSnapshot, fb: firebase}) // sending users to EJS
     })
 })
 
