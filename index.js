@@ -295,15 +295,17 @@ app.get('/sellerprofile', auth, (req, res) => {
                 found = true
                     //user has a seller profile set up so we render normally with their info
                 var products = []
+                var productIds = []
                 productsCollection.get().then(productSnap => {
                     productSnap.forEach(product => {
                         if (product.data().SellerId == seller.id) { // each of their products is displayed
                             products.push(product)
-                                //console.log(product.data())
+                            productIds.push(product.id)
                         }
                     })
                     return res.render('sellerprofile', {
                         products,
+                        productIds,
                         seller,
                         utils,
                         source: 'sellerprofile'
@@ -513,8 +515,6 @@ app.post('/updateuserprofile', auth, (req, res) => {
             return res.render('errorpage', { message: 'No file selected'})
         }
     
-
-    
         const userEmail = firebase.auth().currentUser.email
         const ProfilePicUrl = req.file.filename;
         const FirstName = req.body.firstName;
@@ -601,7 +601,6 @@ app.get('/cart', (req, res) => {
 // CHARGE CREDIT CARD GET ROUTE
 //----------------------------------
 app.post('/charge', (req,res) => {
-    const amount = 10;
 
     //create the customer that paid and render success page
     stripe.customers.create({
