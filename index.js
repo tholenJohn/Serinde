@@ -1,8 +1,11 @@
+
+
 // All npm imports
 const express = require('express')
 var admin = require('firebase-admin')
 const firebase = require('firebase')
 const app = express()
+const stripe = require('stripe')('pk_test_DuPogbGVY05NnsWipp3M3eCm001AB993JZ')
 const bodyParser = require('body-parser')
 const exphbs = require('express-handlebars')
 const pa = require('path')
@@ -48,8 +51,8 @@ app.set('views', './ejsviews');
 app.use('/public', express.static(pa.join(__dirname + '/public')));
 
 
-app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
 
 //----------------------------------
@@ -97,7 +100,7 @@ app.post('/changeemail', auth, (req, res) => {
     const oldEmail = firebase.auth().currentUser.email
     const userEmail = req.body.email
     if (oldEmail == userEmail) {
-        return res.redirect('/userprofile')
+        return res.redirect('/userprofile', {nav: 'storefront', fb: firebase})
     }
     firebase.auth().currentUser.updateEmail(userEmail)
         .then(result => {
@@ -116,7 +119,7 @@ app.post('/changeemail', auth, (req, res) => {
                             users.doc(oldEmail).delete() // deleting old email document
                             users.doc(userEmail).get().then(doc => { // getting new information to send to profile
                                 data = doc.data()
-                                res.render('userprofile', { data })
+                                res.render('userprofile', { data,nav: 'userprofile', fb: firebase })
                             })
                         }) // creating another doc with the same data
 
@@ -292,18 +295,22 @@ app.get('/sellerprofile', auth, (req, res) => {
                 found = true
                     //user has a seller profile set up so we render normally with their info
                 var products = []
+                var productIds = []
                 productsCollection.get().then(productSnap => {
                     productSnap.forEach(product => {
                         if (product.data().SellerId == seller.id) { // each of their products is displayed
                             products.push(product)
-                                //console.log(product.data())
+                            productIds.push(product.id)
                         }
                     })
                     return res.render('sellerprofile', {
                         products,
+                        productIds,
                         seller,
                         utils,
-                        source: 'sellerprofile'
+                        source: 'sellerprofile',
+                        nav:'storefront',
+                        fb: firebase
                     })
                 })
             }
@@ -493,7 +500,7 @@ app.get('/userprofile', (req, res) => {
     const userEmail = firebase.auth().currentUser.email
     users.doc(userEmail).get().then(doc => {
         var data = doc.data()
-        res.render('userprofile', { data })
+        res.render('userprofile', { data, nav: 'storefront', fb: firebase })
     })
 })
 
@@ -509,8 +516,6 @@ app.post('/updateuserprofile', auth, (req, res) => {
         } else if (!req.file) {
             return res.render('errorpage', { message: 'No file selected'})
         }
-    
-
     
         const userEmail = firebase.auth().currentUser.email
         const ProfilePicUrl = req.file.filename;
@@ -555,7 +560,7 @@ app.post('/add2cart', (req, res) => {
     req.session.sc = sc.serialize();
 
     res.redirect('/cart');
-})
+}) 
 
 app.post('/removeFromCart', (req, res) => {
 
@@ -589,10 +594,27 @@ app.get('/cart', (req, res) => {
     res.render('cart', {
         nav: 'cart',
         sc,
-        utils
+        utils,
+        fb: firebase
     });
 })
 
+
+//----------------------------------
+// CHARGE CREDIT CARD GET ROUTE
+//----------------------------------
+app.post('/charge', (req,res) => {
+
+    //create the customer that paid and render success page
+    stripe.customers.create({
+        email: req.body.stripeEmail,
+        source: req.body.stripeToken
+    }) 
+    .then(customer => stripe.charges.create({
+        customer: customer.id
+    }))
+    .then(res.render('success'))
+})
 
 //----------------------------------
 // HOMEPAGE GET ROUTE
@@ -640,7 +662,7 @@ app.get('/', (_req, res) => {
     // CONTACT PAGE GET ROUTE
     //----------------------------------
     app.get('/contact', (req, res) => {
-        res.render('main.handlebars', { nav: 'contact' });
+        res.render('main.handlebars', { nav: 'storefront', fb: firebase });
     });
 
     //==========================================================
@@ -705,10 +727,10 @@ app.get('/productdetail', (req, res) => {
     const productId = req.query._id 
     productsCollection.doc(productId).get()
     .then(product => {
-        res.render('productdetail', {product, utils})
+        res.render('productdetail', {product, utils, fb: firebase, nav:'storefront'})
     })
     .catch(error => {
-        res.render('errorpage', { message: error.message })
+        res.render('errorpage', { message: error.message, fb: firebase, nav: 'storefront' })
     })
 })
 
@@ -758,7 +780,7 @@ app.get('/adminproducts', adminAuth, (req,res)=>{
 
 app.get('/adminusers', adminAuth, (req,res)=>{
     users.get().then(usersSnapshot =>{
-        res.render('adminusers', {users: usersSnapshot}) // sending users to EJS
+        res.render('adminusers', {users: usersSnapshot, fb: firebase}) // sending users to EJS
     })
 })
 

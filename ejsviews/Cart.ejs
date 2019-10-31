@@ -103,48 +103,7 @@
 </head>
 
 <body>
-    <header class="section-header">
-        <section class="header-main">
-            <div class="container">
-                <div class="row align-items-center">
-                    <div class="col-lg-3 col-sm-4">
-                        <div class="brand-wrap">
-                            <h2 class="logo-text">Serinde</h2>
-                        </div>
-                        <!-- brand-wrap.// -->
-                    </div>
-                    <div class="col-lg-6 col-sm-8">
-                        <form action="#" class="search-wrap">
-                            <div class="input-group w-100">
-                                <input type="text" class="form-control" style="width:45%;" placeholder="Search">
-                                <select class="custom-select" name="category_name">
-                                    <option value="">All categories</option><option value="codex">Men</option>
-                                    <option value="comments">Women</option>
-                                    <option value="content">Children</option>
-                                    <option value="content">Babies</option>
-                                    <option value="content">Skin Care Products</option>
-                                    <option value="content">Hair Care Products</option>
-                                    <option value="content">Electronics</option>
-                            </select>
-                                <div class="input-group-append">
-                                    <button class="btn btn-primary" type="submit">
-                                <i class="fa fa-search"></i>
-                              </button>
-                                </div>
-                            </div>
-                        </form>
-                        <!-- search-wrap .end// -->
-                    </div>
-                    <!-- col.// -->
-
-                </div>
-                <!-- row.// -->
-            </div>
-            <!-- container.// -->
-        </section>
-        <!-- header-main .// -->
-    </header>
-    <!-- section-header.// -->
+        <% include ../partials/nav %>
 
 
     <!-- ========================= SECTION CONTENT ========================= -->
@@ -240,90 +199,20 @@
                                 <dd class="text-right"><strong><%= utils.dollar.format(sc.getTotal() + (sc.getTotal() * 0.086)) %></strong></dd>
                             </dl>
                             <hr>
-                            <center>
-                                <!-- <a href="" class="btn btn-primary btn-round">PROCEED TO CHECKOUT</a> -->
-                                <!-- Button trigger modal -->
-                                <button type="button" class="btn btn-primary btn-round" data-toggle="modal" data-target="#exampleModal">Proceed to Checkout</button>
-
-                                <!-- Modal -->
-                                <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                  <div class="modal-dialog" role="document">
-                                    <div class="modal-content">
-                                      <div class="modal-header">
-                                        <h5 class="modal-title" id="exampleModalLabel">Payment info</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                          <span aria-hidden="true">&times;</span>
-                                        </button>
-                                      </div>
-                                      <div class="modal-body">
-                                        <div class="row">
-                                            <div class = "col-md-6">
-                                                <input type = "text" class="name" placeholder="name">
-                                                <input type = "text" class="billing-address" placeholder="Billing Address">
-                                                <input type = "number" class="zip-code" placeholder="Zip Code" maxlength="5">
-                                            </div>
-                                        </div>
-                                        <div class = "row">
-                                            <div class="col-md-6">
-                                                <input type = "text" class="card-number" placeholder="Card Number">
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class ="col-md-6">
-                                            <div class="date-field">
-                                                <div class = "row">
-                                            <p>Month: </p>
-                                              <select name="Month">
-                                                <option value="january">January</option>
-                                                <option value="february">February</option>
-                                                <option value="march">March</option>
-                                                <option value="april">April</option>
-                                                <option value="may">May</option>
-                                                <option value="june">June</option>
-                                                <option value="july">July</option>
-                                                <option value="august">August</option>
-                                                <option value="september">September</option>
-                                                <option value="october">October</option>
-                                                <option value="november">November</option>
-                                                <option value="december">December</option>
-                                              </select>
-                                            </div> </div> </div>
-                                            
-                                            <div class="year">
-                                                    <div class = "row">
-                                                <p>Year: </p>
-                                                <select name="Year">
-                                                  <option value="2016">2016</option>
-                                                  <option value="2017">2017</option>
-                                                  <option value="2018">2018</option>
-                                                  <option value="2019">2019</option>
-                                                  <option value="2020">2020</option>
-                                                  <option value="2021">2021</option>
-                                                  <option value="2022">2022</option>
-                                                  <option value="2023">2023</option>
-                                                  <option value="2024">2024</option>
-                                                </select>
-                                            </div>
-                                        </div> 
-                                        </div>
-                                    
-                                        <div class ="row">
-                                            <div class="col-md-6">
-                                            <div class="cvv-input">
-                                              <input type="text" placeholder="CVV">
-                                            </div>
-                                         </div> 
-                                        </div>
-                                      </div>
-                                      <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                        <a href="" class="btn btn-primary btn-round">Continue</a>           
-                                        </form>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                            </center>
+                            <!-- ----------------------------------------------- -->
+                            <!--                Strip Payment Implementation   -->
+                            <!-- ------------------------------------------------ -->
+                           <form action="/charge" method="POST">
+                                <script 
+                                src="https://checkout.stripe.com/checkout.js"
+                                class="stripe-button"
+                                data-key="pk_test_DuPogbGVY05NnsWipp3M3eCm001AB993JZ"
+                                data-amount='${<%= utils.dollar.format(sc.getTotal() + (sc.getTotal() * 0.086)) %>}'
+                                data-name="Total"
+                                data-description="Total price charaged"
+                                data-locale="auto">
+                                </script>
+                            </form>
                         </aside>
                         <!-- col.// -->
                     </div>
