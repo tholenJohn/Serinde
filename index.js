@@ -215,7 +215,6 @@ app.get('/resetpassword', (req, res) => {
     res.render('resetpassword')
 })
 
-
 //----------------------------------
 // RESET PASSWORD PAGE POST ROUTE
 //----------------------------------
@@ -232,6 +231,7 @@ app.post('/resetpassword', (req, res) => {
         res.render('errorPage', { message: "Enter a valid email" })
     }
 })
+
 
 const multer = require('multer');
 const path = require('path');
@@ -504,7 +504,6 @@ app.get('/userprofile', (req, res) => {
     })
 })
 
-
 //----------------------------------
 // UPDATE USERPAGE POST ROUTE
 //----------------------------------
@@ -533,9 +532,8 @@ app.post('/updateuserprofile', auth, (req, res) => {
     })
 })
 
-
 //----------------------------------
-//SHOPING CART
+//SHOPPING CART
 //----------------------------------
 app.post('/add2cart', (req, res) => {
 

@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <!--  This file has been downloaded from https://bootdey.com  -->
     <!--  All snippets are MIT license https://bootdey.com/license -->
-  
+
     <title>Serinde</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
@@ -15,98 +16,105 @@
     <link href="http://netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../public/css/userprofile.css">
 </head>
+
 <body>
-        <% include ../partials/nav %>
+    <% include ../partials/nav %>
 
-    
-<br>
-<div class="col-md-12">  
-    <div class="col-md-4">      
-        <div class="portlet light profile-sidebar-portlet bordered">
-            <div class="profile-userpic">
-                <img src="/./public/images/<%= data.ProfilePicUrl %>" class="img-responsive" alt=""> </div> <!-- needs to be dynamic to user's profile pic -->
-            <div class="profile-usertitle">
-                <div class="profile-usertitle-name"><%=data.FirstName%></div>
-                <div class="profile-usertitle-job"> User </div>
-                <div class="profile-useretite-email"><%=data.Email%></div>
-                <div class="profile-useretite-location"><%=data.Location%></div>
-            </div>
-            <div class="profile-userbuttons">
-                <a href="/resetpassword" class="btn btn-primary">Reset Password</a>
-            </div>
-            <div class="profile-userbuttons">
-                <a href="/changeemail" class="btn btn-primary">Change Email</a>
-            </div>
-            <div class="profile-userbuttons">
-                <a href="/" class="btn btn-danger">Back</a>
-            </div>
-          
-        </div>
-    </div>
-    <div class="col-md-8"> 
-        <div class="portlet light bordered">
-            <div class="portlet-title tabbable-line">
-                <div class="caption caption-md">
-                    <i class="icon-globe theme-font hide"></i>
-                    <span class="caption-subject font-blue-madison bold uppercase">Your info</span>
-                </div>
-            </div>
-            <div class="portlet-body">
-                <div>
-                
-                    <!-- Nav tabs -->
-                    <ul class="nav nav-tabs" role="tablist">
-                        <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Profile</a></li>
-                        <li role="presentation"><a href="#update" aria-controls="update" role="tab" data-toggle="tab">Update</a></li>
 
-                    </ul>
-                
-                    <!-- Tab panes -->
-                    <div class="tab-content">
-                        <div role="tabpanel" class="tab-pane active" id="home">Dashboard</div>
-
-                        <div role="tabpanel" class="tab-pane" id="update">
-                                <form action='/updateuserprofile' method="POST" enctype="multipart/form-data">
-                                  <div class="form-group">
-                                    <label for="inputName">First Name</label>
-                                    <input type="text" name="firstName" class="form-control" id="firstName" placeholder="<%=data.FirstName%>" >
-                                  </div>
-                                    <div class="form-group">
-                                    <label for="inputLastName">Last Name</label>
-                                    <input type="text" name="lastName" class="form-control" id="lastName" placeholder="<%=data.LastName%>" >
-                                  </div>
-                                <div class="form-group">
-                                    <label for="inputLocation">Location</label>
-                                    <input type="text" name="location" class="form-control" id="location" placeholder="<%=data.Location%>" >
-                                 </div>
-                                  <div class="form-group">
-                                    <label for="exampleInputEmail1">Email address</label>
-                                    <input type="text" readonly name="email" class="form-control" id="exampleInputEmail1" placeholder="<%=data.Email%>" >
-                                  </div>
-                                  <div class="form-group">
-                                        <label for="image">Profile Pic</label> <br>
-                                        <div style="position:relative;">
-                                            <a class='btn btn-primary' href='javascript:;'>
-                                                <input type="file"  name="file_source" onchange='$("#upload-file-info").html($(this).val());'>
-                                            </a>
-                                            <span class='label label-info' id="upload-file-info"></span>
-                                        </div>
-                                        <p class="help-block">jpeg|jpg|png|gif</p>
-                                    </div>  
-                                  <button type="submit" class="btn btn-default">Submit</button>
-                                </form>
+        <br>
+        <div class="col-md-12">
+            <div class="col-md-4">
+                <div class="portlet light profile-sidebar-portlet bordered">
+                    <div class="profile-userpic">
+                        <img src="/./public/images/<%= data.ProfilePicUrl %>" class="img-responsive" alt=""> </div>
+                    <!-- needs to be dynamic to user's profile pic -->
+                    <div class="profile-usertitle">
+                        <div class="profile-usertitle-name">
+                            <%=data.FirstName%>
+                        </div>
+                        <div class="profile-usertitle-job"> User </div>
+                        <div class="profile-useretite-email">
+                            <%=data.Email%>
+                        </div>
+                        <div class="profile-useretite-location">
+                            <%=data.Location%>
                         </div>
                     </div>
-                
+                    <div class="profile-userbuttons">
+                        <a href="/resetpassword" class="btn btn-primary">Reset Password</a>
+                    </div>
+                    <div class="profile-userbuttons">
+                        <a href="/changeemail" class="btn btn-primary">Change Email</a>
+                    </div>
+                    <div class="profile-userbuttons">
+                        <a href="/" class="btn btn-danger">Back</a>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="portlet light bordered">
+                        <div class="portlet-title tabbable-line">
+                            <div class="caption caption-md">
+                                <i class="icon-globe theme-font hide"></i>
+                                <span class="caption-subject font-blue-madison bold uppercase">Your info</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="portlet-body">
+                        <div>
+
+                            <!-- Nav tabs -->
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Profile</a></li>
+                                <li role="presentation"><a href="#update" aria-controls="update" role="tab" data-toggle="tab">Update</a></li>
+
+                            </ul>
+
+                            <!-- Tab panes -->
+                            <div class="tab-content">
+                                <div role="tabpanel" class="tab-pane active" id="home">Dashboard</div>
+
+                                <div role="tabpanel" class="tab-pane" id="update">
+                                    <form action='/updateuserprofile' method="POST" enctype="multipart/form-data">
+                                        <div class="form-group">
+                                            <label for="inputName">First Name</label>
+                                            <input type="text" name="firstName" class="form-control" id="firstName" placeholder="<%=data.FirstName%>">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="inputLastName">Last Name</label>
+                                            <input type="text" name="lastName" class="form-control" id="lastName" placeholder="<%=data.LastName%>">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="inputLocation">Location</label>
+                                            <input type="text" name="location" class="form-control" id="location" placeholder="<%=data.Location%>">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="exampleInputEmail1">Email address</label>
+                                            <input type="text" readonly name="email" class="form-control" id="exampleInputEmail1" placeholder="<%=data.Email%>">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="image">Profile Pic</label> <br>
+                                            <div style="position:relative;">
+                                                <a class='btn btn-primary' href='javascript:;'>
+                                                    <input type="file" name="file_source" onchange='$("#upload-file-info").html($(this).val());'>
+                                                </a>
+                                                <span class='label label-info' id="upload-file-info"></span>
+                                            </div>
+                                            <p class="help-block">jpeg|jpg|png|gif</p>
+                                        </div>
+                                        <button type="submit" class="btn btn-default">Submit</button>
+                                    </form>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
-<script src="http://netdna.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<script type="text/javascript">
-	
-</script>
+        <script src="http://netdna.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <script type="text/javascript">
+        </script>
 </body>
+
 </html>
