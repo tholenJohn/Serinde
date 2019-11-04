@@ -769,11 +769,57 @@ function isAdmin(email) {
 }
 
 //===================================================
-// ADMIN GET ROUTES
+// ADMIN ROUTES
 //===================================================
 
-app.get('/adminproducts', adminAuth, (req,res)=>{
-    
+app.get('/adminsellers', adminAuth, (req,res)=>{
+    sellers.get().then(sellersSnapshot =>{
+        res.render('adminsellers', {sellers: sellersSnapshot, fb: firebase}) // sending sellers to EJS
+    })
+})
+
+app.post('/admindeleteproduct', adminAuth, (req,res)=>{
+    const sender = req.body.sender
+    const sellerid = req.body.sellerid
+    const selleremail = req.body.selleremail
+    const productid = req.body.productid
+
+    productsCollection.doc(productid).delete().then(result=>{
+
+        if(sender == "admin"){
+            productsCollection.where("SellerId", "==", sellerid).get().then(productsFound =>{
+                res.render('adminproducts', {products: productsFound, fb:firebase, sellerid, selleremail})
+            })
+        }else if(sender == "storefront"){
+            res.redirect('/')
+        }
+
+    }).catch(error=>{
+        res.render('errorpage', {message: error.message})
+    })
+})
+
+app.post('/adminclearseller', adminAuth,(req,res) =>{
+    const sellerid = req.body.sellerid
+    productsCollection.get().then(products =>{
+        products.forEach(product=>{
+            if(product.data().SellerId == sellerid){
+                productsCollection.doc(product.id).delete()
+            }
+        })
+        sellers.doc(sellerid).delete().then(result=>{
+            res.redirect('/adminsellers')
+        })
+    })
+})
+
+app.post('/adminproducts', adminAuth, (req,res)=>{
+    const sellerid = req.body.sellerid
+    const selleremail = req.body.selleremail
+
+    productsCollection.where("SellerId", "==", sellerid).get().then(productsFound =>{
+        res.render('adminproducts', {products: productsFound, fb:firebase, sellerid, selleremail})
+    })
 })
 
 app.get('/adminusers', adminAuth, (req,res)=>{
