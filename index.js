@@ -723,9 +723,18 @@ app.get('/', (_req, res) => {
 
 app.get('/productdetail', (req, res) => {
     const productId = req.query._id 
+    var admin
+    if(firebase.auth().currentUser){
+        admin = isAdmin(firebase.auth().currentUser.email)
+    }else{
+        admin = false
+    }
+    
+
     productsCollection.doc(productId).get()
     .then(product => {
-        res.render('productdetail', {product, utils, fb: firebase, nav:'storefront'})
+        res.render('productdetail', {product, utils, fb: firebase, 
+            nav:'storefront', admin})//, admin : isAdmin(firebase.auth().currentUser.email)})
     })
     .catch(error => {
         res.render('errorpage', { message: error.message, fb: firebase, nav: 'storefront' })

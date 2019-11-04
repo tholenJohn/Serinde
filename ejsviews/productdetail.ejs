@@ -79,8 +79,15 @@
                     <div class="section" style="padding-bottom:20px;">
                         <button class="btn btn-success"><span style="margin-right:20px" class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> Add To Cart</button>
                     </div>                                        
-                </div>                              
-        
+                </div>  
+                <%if(admin){%>                            
+                    <form action="/admindeleteproduct" method="POST">
+                        <input type="hidden" name="productid" value="<%=product.id%>">
+                        <input type="hidden" name="sender" value="storefront">
+                        </br>
+                        <button type="submit" class="btn btn-danger">DELETE</button>
+                    </form> 
+                <%}%>
                 <div class="col-xs-9">
                     <ul class="menu-items">
                         <li class="active">Product Details</li>
