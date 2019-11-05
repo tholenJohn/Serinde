@@ -2,6 +2,7 @@
 
 // All npm imports
 const express = require('express')
+const functions = require('firebase-functions');
 var admin = require('firebase-admin')
 const firebase = require('firebase')
 const app = express()
@@ -70,14 +71,12 @@ app.listen(PORT, () => {
 
 app.use(session({
     secret: 'mysupersecretcode!!@#@#!A',
-    saveUninitialized: false,
+    saveUninitialized: true,
     resave: false,
     cookie: {
-        maxAge: 1000 * 60 * 60 * 24
+        maxAge: 1000 * 60 * 60 * 24,
     }
 }));
-
-
 
 //----------------------------------
 // LOGIN PAGE GET ROUTE
@@ -589,7 +588,7 @@ app.get('/cart', (req, res) => {
         sc = ShoppingCart.deserialize(req.session.sc)
     }
 
-    res.render('cart', {
+    res.render('Cart', {
         nav: 'cart',
         sc,
         utils,
@@ -885,3 +884,5 @@ function redirect() {
 app.get('/browse', (req, res) => {
     res.render('search');
 });
+
+exports.app = functions.https.onRequest(app);
