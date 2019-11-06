@@ -741,6 +741,36 @@ app.get('/productdetail', (req, res) => {
     })
 })
 
+app.post('/addfromproductdetail', (req,res)=>{
+    const productid = req.body.productid
+    const quantity = req.body.quantity
+
+    let sc;
+    if (!req.session.sc) {
+        sc = new ShoppingCart();
+    } else {
+        sc = ShoppingCart.deserialize(req.session.sc)
+    }
+
+    productsCollection.doc(productid).get().then(product =>{
+        for(var i = 0; i < quantity; i++){
+            sc.add({
+                id: product.id,
+                title: product.data().ProductTitle,
+                price: product.data().ProductPrice,
+                image: product.data().ProductImage
+            })
+        }
+        res.render('cart', {
+            nav: 'cart',
+            sc,
+            utils,
+            fb: firebase
+        });
+    })
+    
+    
+})
 
 
 //==========================================================
