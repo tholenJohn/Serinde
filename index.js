@@ -2,6 +2,7 @@
 
 // All npm imports
 const express = require('express')
+const functions = require('firebase-functions');
 var admin = require('firebase-admin')
 const firebase = require('firebase')
 const app = express()
@@ -70,14 +71,12 @@ app.listen(PORT, () => {
 
 app.use(session({
     secret: 'mysupersecretcode!!@#@#!A',
-    saveUninitialized: false,
+    saveUninitialized: true,
     resave: false,
     cookie: {
-        maxAge: 1000 * 60 * 60 * 24
+        maxAge: 1000 * 60 * 60 * 24,
     }
 }));
-
-
 
 //----------------------------------
 // LOGIN PAGE GET ROUTE
@@ -137,7 +136,7 @@ app.post('/changeemail', auth, (req, res) => {
             })
         })
         .catch(error => {
-            res.render('errorPage', { message: error.message })
+            res.render('errorpage', { message: error.message })
         })
 
 })
@@ -154,9 +153,9 @@ app.post('/login', (req, res) => {
         })
         .catch(error => {
             if (email == "") {
-                res.render('errorPage', { message: "The email is blank!" })
+                res.render('errorpage', { message: "The email is blank!" })
             } else
-                res.render('errorPage', { message: error.message })
+                res.render('errorpage', { message: error.message })
         })
 })
 
@@ -192,7 +191,7 @@ app.post('/signup', (req, res) => {
                                 res.redirect('/') // to homepage
                             })
                             .catch(error => {
-                                res.render('errorPage', { message: error.message })
+                                res.render('errorpage', { message: error.message })
                             })
                     })
                     .catch(error => {
@@ -200,10 +199,10 @@ app.post('/signup', (req, res) => {
                     })
             })
             .catch(error => {
-                res.render('errorPage', { message: error.message })
+                res.render('errorpage', { message: error.message })
             })
     } else {
-        res.render('errorPage', { message: "The passwords do not match." })
+        res.render('errorpage', { message: "The passwords do not match." })
     }
 })
 
@@ -228,7 +227,7 @@ app.post('/resetpassword', (req, res) => {
                 res.redirect('/login')
             })
     } else {
-        res.render('errorPage', { message: "Enter a valid email" })
+        res.render('errorpage', { message: "Enter a valid email" })
     }
 })
 
@@ -319,7 +318,7 @@ app.get('/sellerprofile', auth, (req, res) => {
             return res.render('sellerprofilesetup')
         }
     }).catch(error => {
-        res.render('errorPage', { message: error })
+        res.render('errorpage', { message: error })
     })
 
 })
@@ -340,7 +339,7 @@ app.get('/sellerprofile/productupdate', (req, res) => {
                         })
                     })
                     .catch(error => {
-                        res.render('errorPage', { message: error })
+                        res.render('errorpage', { message: error })
                     })
             }
         })
@@ -372,7 +371,7 @@ app.post('/sellerprofile/productupdate', (req, res) => {
                                 res.redirect('/sellerprofile')
                             })
                             .catch(error => {
-                                res.render('errorPage', {
+                                res.render('errorpage', {
                                     source: '/sellerprofile#products',
                                     error
                                 });
@@ -399,7 +398,7 @@ app.post('/sellerprofile/productupdate', (req, res) => {
                                 res.redirect('/sellerprofile')
                             })
                             .catch(error => {
-                                res.render('errorPage', {
+                                res.render('errorpage', {
                                     source: '/sellerprofile#products',
                                     error
                                 });
@@ -446,7 +445,7 @@ app.post('/sellerprofile/productadd', (req, res) => {
                             return res.redirect('/sellerprofile')
                         })
                         .catch(error => {
-                            return res.render('errorPage', {
+                            return res.render('errorpage', {
                                 source: '/sellerprofile#products',
                                 error
                             });
@@ -589,7 +588,7 @@ app.get('/cart', (req, res) => {
         sc = ShoppingCart.deserialize(req.session.sc)
     }
 
-    res.render('cart', {
+    res.render('Cart', {
         nav: 'cart',
         sc,
         utils,
@@ -761,7 +760,7 @@ function auth(req, res, next) {
     if (firebase.auth().currentUser) {
         next()
     } else {
-        res.render('errorPage', { message: "Unauthorized access! Login to access this page." })
+        res.render('errorpage', { message: "Unauthorized access! Login to access this page." })
     }
 }
 
@@ -769,7 +768,7 @@ function adminAuth(req, res, next) {
     if (firebase.auth().currentUser && isAdmin(firebase.auth().currentUser.email)) {
         next()
     } else {
-        res.render('errorPage', { message: "Unauthorized access! Privileged users only." })
+        res.render('errorpage', { message: "Unauthorized access! Privileged users only." })
     }
 }
 
@@ -885,3 +884,5 @@ function redirect() {
 app.get('/browse', (req, res) => {
     res.render('search');
 });
+
+exports.app = functions.https.onRequest(app);
