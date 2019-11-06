@@ -66,24 +66,25 @@
 
                     <h6 class="title-price"><small>Price</small></h6>
                     <h3 style="margin-top:0px;"><%= utils.dollar.format(product.data().ProductPrice) %></h3>
-         
-                    <div class="section" style="padding-bottom:20px;">
-                        <h6 class="title-attr"><small>QUANTITY</small></h6>                    
-                        <div>
-                            <div class="btn-minus"><span class="glyphicon glyphicon-minus"></span></div>
-                            <input value="1" />
-                            <div class="btn-plus"><span class="glyphicon glyphicon-plus"></span></div>
-                        </div>
-                    </div>                
+                    <form action="/addfromproductdetail" method="POST">
+                        <div class="section" style="padding-bottom:20px;">
+                            <h6 class="title-attr"><small>QUANTITY</small></h6>                    
+                            <div>
+                                <div class="btn-minus"><span class="glyphicon glyphicon-minus"></span></div>
+                                <input name="quantity" value="1" />
+                                <div class="btn-plus"><span class="glyphicon glyphicon-plus"></span></div>
+                            </div>
+                        </div>                
 
-                    <div class="section" style="padding-bottom:20px;">
-                        <button class="btn btn-success"><span style="margin-right:20px" class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> Add To Cart</button>
-                    </div>                                        
+                        <div class="section" style="padding-bottom:20px;">
+                                <input type="hidden" name="productid" value="<%=product.id%>">
+                                <button class="btn btn-success" type="submit"><span style="margin-right:20px" class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> Add To Cart</button>
+                        </div>  
+                    </form>                                      
                 </div>  
                 <%if(admin){%>                            
                     <form action="/admindeleteproduct" method="POST">
                         <input type="hidden" name="productid" value="<%=product.id%>">
-                        <input type="hidden" name="sender" value="storefront">
                         </br>
                         <button type="submit" class="btn btn-danger">DELETE</button>
                     </form> 
