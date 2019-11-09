@@ -1,71 +1,70 @@
-<div class="modal fade" id="modalProductFormAdd" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-  aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header text-center">
-        <h4 class="modal-title w-100 font-weight-bold">Add or Edit Product</h4>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+<div class="modal fade" id="modalProductFormAdd" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <h4 class="modal-title w-100 font-weight-bold">Add or Edit Product</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
-      </div>
-      <div class="modal-body mx-3">
-            <form action="/sellerprofile/productadd" method="POST" id="insertForm" onsubmit="return validateForm()" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label for="image">Image</label> <br>
-                    <div>
-                        <a class='btn btn-primary'>
-                            <input type="file"  name="file_source" onchange='$("#upload-file-info").html($(this).val());'>
-                        </a>
-                        &nbsp;
-                        <span class='label label-info' id="upload-file-info"></span>
+            </div>
+            <div class="modal-body mx-3">
+                <form action="/sellerprofile/productadd" method="POST" id="insertForm" onsubmit="return validateForm()" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="image">Image</label> <br>
+                        <div>
+                            <a class='btn btn-primary'>
+                                <input type="file" name="file_source" onchange='$("#upload-file-info").html($(this).val());'>
+                            </a>
+                            &nbsp;
+                            <span class='label label-info' id="upload-file-info"></span>
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label for="Title">Title</label> <br>
-                    <input type="text" class="form-control" name="title" id="title" placeholder="">
-                </div>
-    
-                <div class="form-group">
-                    <label for="price">Price</label> <br>
-                    <input type="text" class="form-control" name="price" id="price" placeholder="">
-                </div>
-    
-                <div class="form-group"> 
-                    <label for="description">Description</label> <br>
-                    <textarea name="description" row="5" cols="77" id="description" placeholder=""></textarea>
-                </div>
+                    <div class="form-group">
+                        <label for="Title">Title</label> <br>
+                        <input type="text" class="form-control" name="title" id="title" placeholder="">
+                    </div>
 
-                <div class="form-group">
+                    <div class="form-group">
+                        <label for="price">Price</label> <br>
+                        <input type="text" class="form-control" name="price" id="price" placeholder="">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Description</label> <br>
+                        <textarea name="description" row="5" cols="77" id="description" placeholder=""></textarea>
+                    </div>
+
+                    <div class="form-group">
                         <label for="sel1">Category:</label>
                         <select class="form-control" name="category" id="category">
                           <option>Fashion-Men</option>
                           <option>Fashion-Women</option>
                           <option>Fashion-Chidren</option>
                           <option>Beauty-SkinCare</option>
-                          <option>Beauty-HareCare</option>
+                          <option>Beauty-HairCare</option>
                           <option>Beauty-Cosmetics</option>
                           <option>Electronics-Computers & Tablets</option>
                           <option>Electronics-TV & Audio</option>
                           <option>Cell phones & Accessories</option>
                         </select>
-                </div>
-    
-    
-                <button type="submit" class="btn btn-primary">Submit</button>
-            </form>
-      </div>
+                    </div>
+
+
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 
 <script>
-  function validateForm() {
-      const price = document.forms["insertForm"]["price"].value;
-      if (!parseFloat(price)) {
-          alert("Price must be a number")
-          return false;
-      }
-      return true;
+    function validateForm() {
+        const price = document.forms["insertForm"]["price"].value;
+        if (!parseFloat(price)) {
+            alert("Price must be a number")
+            return false;
+        }
+        return true;
 
-  }
+    }
 </script>

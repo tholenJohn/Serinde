@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <% include ../partials/header %>
+  <title>ADMIN HOME</title>
+</head>
+
+<body>
+        <h1>ADMIN <span class="badge badge-secondary">PRODUCTS</span></h1>
+    <div class="jumbotron">
+        <a href="/adminsellers" class="btn btn-danger">Back</a>
+        <table class="table table-striped table-dark">
+                <thead>
+                  <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Seller</th>
+                    <th scope="col"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <%products.forEach(product=>{%>
+                    <tr>
+                        <td><%=product.data().ProductTitle%></td>
+                        <td><%=product.data().ProductDescription%></td>
+                        <td><%=product.data().ProductPrice%></td>
+                        <td><%=selleremail%></td>
+                        <td>
+                            <form action="/admindeleteproduct" method="POST">
+                                <input type="hidden" name="productid" value="<%=product.id%>">
+                                <input type="hidden" name="sellerid" value="sellerid">
+                                <input type="hidden" name="selleremail" value="selleremail">
+                                <input type="hidden" name="sender" value="admin">
+                                   </br>
+                                <button type="submit" class="btn btn-danger">DELETE</button>
+                            </form> 
+                        </td>
+                    </tr>
+                  <%})%>
+                </tbody>
+              </table>
+    </div>
+  <% include ../partials/scripts %>
+</body>
+
+</html>

@@ -1,0 +1,12 @@
+{
+  "hosting": {
+    "public": ".",
+    "rewrites": [ {
+      "source": "**",
+      "function": "app"
+    } ]
+  },
+  "functions": {
+    "source": "."
+  }
+}
