@@ -352,7 +352,6 @@ app.post('/sellerprofile/productupdate', (req, res) => {
         if (error) {
             return res.render('errorpage', { message: error })
         } else if (!req.file) {
-            //return res.render('errorpage', {message: "File not found!"})
             sellers.get().then(sellersSnap => {
                 sellersSnap.forEach(seller => {
                     if (firebase.auth().currentUser.email == seller.data().Email) {
@@ -363,6 +362,7 @@ app.post('/sellerprofile/productupdate', (req, res) => {
                             ProductImage: req.body.productImage,
                             ProductPrice: req.body.price,
                             ProductTitle: req.body.title,
+                            ProductUrl: req.body.url,
                             SellerId: seller.id
                         }
 
@@ -380,6 +380,11 @@ app.post('/sellerprofile/productupdate', (req, res) => {
                 })
             })
         } else {
+            storage.bucket('gs://serinde-dae45.appspot.com').upload('./'+req.file.path).then(result=>{
+            storage.bucket('gs://serinde-dae45.appspot.com').file(req.file.filename).getSignedUrl({                                                                      
+                action: 'read',                                                               
+                expires: '03-01-2500',                                                        
+              }).then(url=>{
             sellers.get().then(sellersSnap => {
                 sellersSnap.forEach(seller => {
                     if (firebase.auth().currentUser.email == seller.data().Email) {
@@ -390,6 +395,7 @@ app.post('/sellerprofile/productupdate', (req, res) => {
                             ProductImage: req.file.filename,
                             ProductPrice: req.body.price,
                             ProductTitle: req.body.title,
+                            ProductUrl: url[0],
                             SellerId: seller.id
                         }
 
@@ -406,6 +412,7 @@ app.post('/sellerprofile/productupdate', (req, res) => {
                     }
                 })
             })
+            })})
         }
     })
 })
@@ -791,24 +798,6 @@ app.get('/logout', (req, res) => {
             res.send(error)
         })
 })
-
-//image url array
-
-function getImageURLs(){
-
-    var array = new Array()
-
-    productsCollection.get().then(products=>{
-        products.forEach(product=>{
-            storage.bucket('gs://serinde-dae45.appspot.com').
-            file(product.data().ProductImage).getSignedUrl({action: 'read', expires: '03-01-2500'}).then(url=>{
-                array.push({fileName: product.data().ProductImage, url})
-            })
-        })
-    })
-
-    return array
-}
 
 //auth functions
 function auth(req, res, next) {
