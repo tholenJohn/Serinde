@@ -509,32 +509,41 @@ app.get('/userprofile', (req, res) => {
 app.post('/updateuserprofile', auth, (req, res) => {
 
     imageUpload(req, res, error => {
+        var ProfilePicUrl = "";
+        const userEmail = firebase.auth().currentUser.email
+        var FirstName = req.body.firstName
+        var LastName = req.body.lastName
+        var Location = req.body.location
+
         if (error) {
             return res.render('errorpage', { message: error })
         } else if (!req.file) {
-            return res.render('errorpage', { message: 'No file selected'})
+            users.doc(userEmail).update({ FirstName, LastName, Location })
+                .then(result => {
+                    res.redirect('/userprofile')
+                })
+                .catch(error => {
+                    res.render('errorpage', { message: error.message })
+                })
+        } else {
+            ProfilePicUrl = req.file.filename
+            users.doc(userEmail).update({ FirstName, LastName, Location, ProfilePicUrl })
+                .then(result => {
+                    res.redirect('/userprofile')
+                })
+                .catch(error => {
+                    res.render('errorpage', { message: error.message })
+                })
         }
-    
-        const userEmail = firebase.auth().currentUser.email
-        const ProfilePicUrl = req.file.filename;
-        const FirstName = req.body.firstName;
-        const LastName = req.body.lastName;
-        const Location = req.body.location;
-        
-        users.doc(userEmail).set({ FirstName, LastName, Location, ProfilePicUrl })
-            .then(result => {
-                res.redirect('/userprofile')
-            })
-            .catch(error => {
-                res.render('errorpage', { message: error.message })
-            })
+
+
     })
 })
 
 //----------------------------------
 //SHOPPING CART
 //----------------------------------
-app.post('/add2cart', (req, res) => {
+app.post('/add2cart', auth, (req, res) => {
 
     let sc;
     if (!req.session.sc) {
@@ -790,7 +799,7 @@ function auth(req, res, next) {
     if (firebase.auth().currentUser) {
         next()
     } else {
-        res.render('errorpage', { message: "Unauthorized access! Login to access this page." })
+        res.render('login', { message: "Unauthorized access! Login to perform this action." })
     }
 }
 
@@ -798,7 +807,7 @@ function adminAuth(req, res, next) {
     if (firebase.auth().currentUser && isAdmin(firebase.auth().currentUser.email)) {
         next()
     } else {
-        res.render('errorpage', { message: "Unauthorized access! Privileged users only." })
+        res.render('login', { message: "Unauthorized access! Privileged users only." })
     }
 }
 
