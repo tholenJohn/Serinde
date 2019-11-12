@@ -1,3 +1,12 @@
+<!-- Required meta tags -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link href='https://fonts.googleapis.com/css?family=Advent+Pro:300,700' rel='stylesheet' type='text/css' />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
 <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
 <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
@@ -44,6 +53,8 @@
     </style>
     </head>
     <body>
+            <% include ../partials/nav %>
+
         <div class="container">
         	<div class="row">
                <div class="col-xs-4 item-photo">
@@ -55,21 +66,29 @@
 
                     <h6 class="title-price"><small>Price</small></h6>
                     <h3 style="margin-top:0px;"><%= utils.dollar.format(product.data().ProductPrice) %></h3>
-         
-                    <div class="section" style="padding-bottom:20px;">
-                        <h6 class="title-attr"><small>QUANTITY</small></h6>                    
-                        <div>
-                            <div class="btn-minus"><span class="glyphicon glyphicon-minus"></span></div>
-                            <input value="1" />
-                            <div class="btn-plus"><span class="glyphicon glyphicon-plus"></span></div>
-                        </div>
-                    </div>                
+                    <form action="/addfromproductdetail" method="POST">
+                        <div class="section" style="padding-bottom:20px;">
+                            <h6 class="title-attr"><small>QUANTITY</small></h6>                    
+                            <div>
+                                <div class="btn-minus"><span class="glyphicon glyphicon-minus"></span></div>
+                                <input name="quantity" value="1" />
+                                <div class="btn-plus"><span class="glyphicon glyphicon-plus"></span></div>
+                            </div>
+                        </div>                
 
-                    <div class="section" style="padding-bottom:20px;">
-                        <button class="btn btn-success"><span style="margin-right:20px" class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> Add To Cart</button>
-                    </div>                                        
-                </div>                              
-        
+                        <div class="section" style="padding-bottom:20px;">
+                                <input type="hidden" name="productid" value="<%=product.id%>">
+                                <button class="btn btn-success" type="submit"><span style="margin-right:20px" class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> Add To Cart</button>
+                        </div>  
+                    </form>                                      
+                </div>  
+                <%if(admin){%>                            
+                    <form action="/admindeleteproduct" method="POST">
+                        <input type="hidden" name="productid" value="<%=product.id%>">
+                        </br>
+                        <button type="submit" class="btn btn-danger">DELETE</button>
+                    </form> 
+                <%}%>
                 <div class="col-xs-9">
                     <ul class="menu-items">
                         <li class="active">Product Details</li>
