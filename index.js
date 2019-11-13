@@ -352,7 +352,6 @@ app.post('/sellerprofile/productupdate', (req, res) => {
         if (error) {
             return res.render('errorpage', { message: error })
         } else if (!req.file) {
-            //return res.render('errorpage', {message: "File not found!"})
             sellers.get().then(sellersSnap => {
                 sellersSnap.forEach(seller => {
                     if (firebase.auth().currentUser.email == seller.data().Email) {
@@ -363,6 +362,7 @@ app.post('/sellerprofile/productupdate', (req, res) => {
                             ProductImage: req.body.productImage,
                             ProductPrice: req.body.price,
                             ProductTitle: req.body.title,
+                            ProductUrl: req.body.url,
                             SellerId: seller.id
                         }
 
@@ -380,6 +380,11 @@ app.post('/sellerprofile/productupdate', (req, res) => {
                 })
             })
         } else {
+            storage.bucket('gs://serinde-dae45.appspot.com').upload('./'+req.file.path).then(result=>{
+            storage.bucket('gs://serinde-dae45.appspot.com').file(req.file.filename).getSignedUrl({                                                                      
+                action: 'read',                                                               
+                expires: '03-01-2500',                                                        
+              }).then(url=>{
             sellers.get().then(sellersSnap => {
                 sellersSnap.forEach(seller => {
                     if (firebase.auth().currentUser.email == seller.data().Email) {
@@ -390,6 +395,7 @@ app.post('/sellerprofile/productupdate', (req, res) => {
                             ProductImage: req.file.filename,
                             ProductPrice: req.body.price,
                             ProductTitle: req.body.title,
+                            ProductUrl: url[0],
                             SellerId: seller.id
                         }
 
@@ -406,6 +412,7 @@ app.post('/sellerprofile/productupdate', (req, res) => {
                     }
                 })
             })
+            })})
         }
     })
 })
@@ -418,42 +425,46 @@ app.post('/sellerprofile/productadd', (req, res) => {
         } else if (!req.file) {
             return res.render('errorpage', { message: 'No file selected' });
         }
-    
-        //this code uploads the picture to firebase storage
-        /*
-        storage.bucket('gs://serinde-dae45.appspot.com').upload('./'+req.file.path)
+
+        storage.bucket('gs://serinde-dae45.appspot.com').upload('./'+req.file.path).then(result=>{
+            storage.bucket('gs://serinde-dae45.appspot.com').file(req.file.filename).getSignedUrl({                                                                      
+                action: 'read',                                                               
+                expires: '03-01-2500',                                                        
+              }).then(url=>{
+                sellers.get().then(sellersSnap=>{
+                    sellersSnap.forEach(seller =>{
+
+                        if(firebase.auth().currentUser.email == seller.data().Email){
+                            let data = {
+                                ProductCategory: req.body.category,
+                                ProductDescription: req.body.description,
+                                ProductImage: req.file.filename,
+                                ProductPrice: req.body.price,
+                                ProductTitle: req.body.title,
+                                ProductUrl: url[0],
+                                SellerId: seller.id
+                            }
+        
+                            productsCollection.doc().set(data)
+                                .then(result => {
+                                    return res.redirect('/sellerprofile')
+                                })
+                                .catch(error => {
+                                    return res.render('errorpage', {
+                                        source: '/sellerprofile#products',
+                                        error
+                                    });
+                                })
+                        }
+                    })
+                })
+            }).catch(error=>{
+                return res.render('errorpage', { message: error.message});
+            })
+        })
         .catch(error=>{
             return res.render('errorpage', { message: error.message});
         })
-        //then we need to delete it form local folder
-        */
-        
-        sellers.get().then(sellersSnap=>{
-            sellersSnap.forEach(seller =>{
-                if(firebase.auth().currentUser.email == seller.data().Email){
-                    let data = {
-                        ProductCategory: req.body.category,
-                        ProductDescription: req.body.description,
-                        ProductImage: req.file.filename,
-                        ProductPrice: req.body.price,
-                        ProductTitle: req.body.title,
-                        SellerId: seller.id
-                    }
-
-                    productsCollection.doc().set(data)
-                        .then(result => {
-                            return res.redirect('/sellerprofile')
-                        })
-                        .catch(error => {
-                            return res.render('errorpage', {
-                                source: '/sellerprofile#products',
-                                error
-                            });
-                        })
-                }
-            })
-        })
-
     })
 })
 
@@ -625,6 +636,7 @@ app.post('/charge', (req,res) => {
 //----------------------------------
 // HOMEPAGE GET ROUTE
 //----------------------------------
+
 app.get('/', (_req, res) => {
     var products = []
     var categories = []
@@ -646,7 +658,8 @@ app.get('/', (_req, res) => {
                     nav: 'adminstorefront',
                     fb: firebase,
                     products,
-                    uniqueCategories
+                    uniqueCategories,
+                    images: storage.bucket('gs://serinde-dae45.appspot.com')
                 });
               }
             }
@@ -654,7 +667,8 @@ app.get('/', (_req, res) => {
                     nav: 'storefront',
                     fb: firebase,
                     products,
-                    uniqueCategories
+                    uniqueCategories,
+                    images: storage.bucket('gs://serinde-dae45.appspot.com')
                 });
         })
         .catch(error => {

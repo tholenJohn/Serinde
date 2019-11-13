@@ -96,29 +96,30 @@
                                 <div class="row-config">
                                     <% products.forEach(product => { %>
                                         <% if (product.data().ProductCategory === uniqueCategories[i]) { %>
-                                            <div class="oneCard each-card">
-                                                <div class="card" style="width: 18rem;">
-                                                    <img class="img-config" class="card_row" class="card-img-top" src="/./public/images/<%=product.data().ProductImage %>" alt="Missing Image">
-                                                    <div class="card-body">
-                                                        <h5 class="card-title">
-                                                            <a href="/productdetail?_id=<%= product.id %>" class="card-link" role="button">
-                                                                <%= product.data().ProductTitle %>
-                                                            </a>
-                                                        </h5>
-                                                        <p class="card-text desc-limit">
-                                                            <%= product.data().ProductDescription %>
-                                                        </p>
+                                                <div class="oneCard each-card">
+                                                    <div class="card" style="width: 18rem;">
+                                                        <img class="img-config" class="card_row" class="card-img-top" src="<%= product.data().ProductUrl %>" alt="Missing Image">
+                                                        <div class="card-body">
+                                                            <h5 class="card-title">
+                                                                <a href="/productdetail?_id=<%= product.id %>" class="card-link" role="button">
+                                                                    <%= product.data().ProductTitle %>
+                                                                </a>
+                                                            </h5>
+                                                            <p class="card-text desc-limit">
+                                                                <%= product.data().ProductDescription %>
+                                                            </p>
 
-                                                        <form action='/add2cart' method="POST">
-                                                            <input type="hidden" name="id" value="<%= product.id %>">
-                                                            <input type="hidden" name="title" value="<%= product.data().ProductTitle %>">
-                                                            <input type="hidden" name="price" value="<%= product.data().ProductPrice %>">
-                                                            <input type="hidden" name="image" value="<%= product.data().ProductImage %>">
-                                                            <a href="#" onclick="this.parentNode.submit()" class="btn btn-outline-secondary">Add To Cart</a>
-                                                        </form>
+                                                            <form action='/add2cart' method="POST">
+                                                                <input type="hidden" name="id" value="<%= product.id %>">
+                                                                <input type="hidden" name="title" value="<%= product.data().ProductTitle %>">
+                                                                <input type="hidden" name="price" value="<%= product.data().ProductPrice %>">
+                                                                <input type="hidden" name="image" value="<%= product.data().ProductImage %>">
+                                                                <input type="hidden" name="imageurl" value="<%= product.data().ProductUrl %>">
+                                                                <a href="#" onclick="this.parentNode.submit()" class="btn btn-outline-secondary">Add To Cart</a>
+                                                            </form>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
                                             <% } %>
                                         <% }) %>
                                 </div>
