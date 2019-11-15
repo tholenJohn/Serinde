@@ -21,10 +21,6 @@ h3 {
     color: #8B4513;
 }
 
-.column-2 {
-
-}
-
 .row-config {
     display: flex;
     overflow-x: scroll;
@@ -33,13 +29,11 @@ h3 {
 
 .each-card {
     padding: 5px;
-    
 }
 
 .img-config {
     height: 200px;
 }
-
 
 .desc-limit {
     display: block;
