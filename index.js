@@ -210,6 +210,7 @@ app.post('/signup', (req, res) => {
 //----------------------------------
 app.get('/resetpassword', (req, res) => {
     res.render('resetpassword')
+    // test
 })
 
 //----------------------------------
