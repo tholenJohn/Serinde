@@ -616,7 +616,11 @@ app.get('/cart', (req, res) => {
     });
 })
 
+app.get('/test', (req,res) => { 
+    
 
+        res.render('success');
+})
 //----------------------------------
 // CHARGE CREDIT CARD GET ROUTE
 //----------------------------------
@@ -631,6 +635,163 @@ app.post('/charge', (req,res) => {
         customer: customer.id
     }))
     .then(res.render('success'))
+
+        //The long work of normalizing and putting in the bought data to the user
+        let sc;
+        sc = ShoppingCart.deserialize(req.session.sc)
+        let reducer = (accumulator, currentValue) => accumulator + currentValue;
+        var ids = sc.getProductsNames();
+        var iter = 0;
+        var numOfCategory = [];
+        var price = [];
+        var totals = [];
+        var means = [];
+        var range_price = [];
+        var normalizedprice = [];
+        var currentProductPrice = [];
+        var productEmailStuff = [];
+        var sellerID = [];
+        productsCollection.get().then(productSnap => {
+            productSnap.forEach(product => {
+                for(i of ids) {
+                    if(product.id ==i) {
+                        var temp = product.data().ProductCategory;
+                        numOfCategory.push(temp);
+                        currentProductPrice.push(parseFloat(product.data().ProductPrice));
+                        var sellerInfo = {
+                            id: product.data().SellerId,
+                            productSold: product.data().ProductTitle 
+                        }
+                        sellerID.push(sellerInfo);
+                        productEmailStuff.push(product.data().ProductTitle.toString());
+                    }     
+                }
+            });
+        }).then(function onSuccess(res) {
+        productsCollection.get().then(productSnap => {
+            for(i of numOfCategory) {
+            productSnap.forEach(product => {
+                    if(product.data().ProductCategory == i) {
+                        var temp = parseFloat(product.data().ProductPrice);
+                        price.push(temp);   
+                } 
+            }); if(price.length > 0) {
+                totals.push(price.reduce(reducer));
+                means.push(totals[totals.length - 1]/price.length);
+                price.sort();
+                range_price.push(price[price.length-1] - price[0]);
+                normalizedprice.push(Math.abs((means[means.length - 1]
+                    - currentProductPrice[iter])
+                    /range_price[range_price.length-1]));
+                price = [];
+            }
+            iter++;
+        };
+        }).then(function onSuccess(res) {
+            var calcHigh = 0;
+            var calcMid = 0;
+            var calcLow = 0;
+            for(var i = 0; i < ids.length; i++) {
+                if(normalizedprice[i] > 0.66) {
+                    calcHigh = 1;
+                    calcLow = calcMid = 0;
+                } else if(normalizedprice[i] > 0.33) {
+                    calcMid = 1;
+                    calcLow = calcHigh = 0;
+                } else {
+                    calcLow = 1;
+                    calcHigh = calcMid = 0;
+                }
+            var data = {
+                ProductID: ids[i],
+                ProductCategory: numOfCategory[i],
+                high: calcHigh,
+                mid: calcMid,
+                low: calcLow,
+            }
+            users.doc(firebase.auth().currentUser.email).collection('bought').doc().set(data)
+        }
+        })
+        })
+        //sending email to current user that purchased information
+        var transporter = nodemailer.createTransport({
+            host: 'smtp.gmail.com',
+            auth: {
+                user: 'tholenjohn@gmail.com', // generated ethereal user
+                pass: 'Ded4hibyee' // generated ethereal password
+            },
+        });
+        
+        var message = [];
+        var massProductList = productEmailStuff[0];
+        //combining all the products purchased for emailing
+        for(var j = 1; j < productEmailStuff.length; j++) {
+            massProductList.concat(", " + productEmailStuff[j]);
+        }
+        var mailOptions = {
+            from: '"Nodemailer Contact" <tholenjohn@gmail.com>',
+            to: firebase.auth().currentUser.email,
+            subject: 'Conformation of purchase',
+            text: `Hello, \nThank you for your purchase.`
+        };
+        //for sending out conformation of purchase
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.log(error);
+            }
+            else {
+                console.log('Email sent: ' + info.response);
+            }
+        });
+
+        //for sending email to seller
+            sellers.get().then(sellerSnapshot =>{
+                for(var i = 0; i < sellerID.length; i ++) {
+                sellerSnapshot.forEach(sellerSnapshot2 =>{
+                    if(sellerID[i].id == sellerSnapshot2.id) {
+                        var messageToBeSent = {
+                            from: '"Nodemailer Contact" <tholenjohn@gmail.com>',
+                            to: sellerSnapshot2.data().Email,
+                            subject: 'Your product has sold',
+                            text: `Hello,\nYour product ` + sellerID[i].productSold +  ` has been purchased.`
+                        };
+                        transporter.sendMail(messageToBeSent, (error, info) => {
+                            if (error) {
+                                console.log(error);
+                            }
+                            else {
+                                console.log('Email sent: ' + info.response);
+                            }
+                        });
+                        
+                    }
+                })
+            }
+            
+        }) 
+    
+          
+        transporter.sendMail(message[0], (error, info) => {
+            if (error) {
+                console.log(error);
+            }
+            else {
+                console.log('Email sent: ' + info.response);
+            }
+        });
+       
+    /*
+    for (i of message) {    
+            transporter.sendMail(i, (error, info) =>{
+            if(error) {
+                console.log(error);
+            } else{
+                console.log('Email sent: ' + info.response);
+                wait = false;
+            }
+        }) 
+    } */
+        
 })
 
 //----------------------------------
