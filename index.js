@@ -768,16 +768,6 @@ app.post('/charge', (req, res) => {
             }
             
         }) 
-    
-          
-        transporter.sendMail(message[0], (error, info) => {
-            if (error) {
-                console.log(error);
-            }
-            else {
-                console.log('Email sent: ' + info.response);
-            }
-        });
        
     /*
     for (i of message) {    
