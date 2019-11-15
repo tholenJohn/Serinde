@@ -14,77 +14,33 @@
 
 <body>
 
-        <% include ../partials/nav %>
+    <% include ../partials/nav %>
 
         <div class="container-fluid ">
             <div class="row">
                 <div class="col-3 column-1">
                     <!-- Category should be listed here -->
+
                     <div class="vertical-menu left-menu">
-                        <a href="#" class="active"><i class="fa fa-bars"></i> Categories</a>
 
-                        <ul class="mainmenu">
-                            <li><a href="">Men's Fashion</a>
-                                <ul class="submenu">
-                                    <li><a href="/menTops">Tops</a></li>
-                                    <li><a href="/menBottoms">Bottoms</a></li>
-                                    <li><a href="/menFootwear">Footwear</a></li>
-                                </ul>
-                            </li>
-
-                            <li><a href="">Women's Fashion</a>
-                                <ul class="submenu">
-                                    <li><a href="/womenTops">Tops</a></li>
-                                    <li><a href="/womenBottoms">Bottoms</a></li>
-                                    <li><a href="/womenFootwear">Footwear</a></li>
-                                </ul>
-                            </li>
-
-                            <li><a href="">Children's Fashion</a>
-                                <ul class="submenu">
-                                    <li><a href="">Tops</a></li>
-                                    <li><a href="">Bottoms</a></li>
-                                    <li><a href="">Footwear</a></li>
-                                </ul>
-                            </li>
-
-                            <li><a href="">Babies' Fashion</a>
-                                <ul class="submenu">
-                                    <li><a href="/babiesTops">Tops</a></li>
-                                    <li><a href="/babiesBottoms">Bottoms</a></li>
-                                    <li><a href="/babiesFootwear">Footwear</a></li>
-                                </ul>
-                            </li>
-
-                            <li><a href="">Skin Care Products</a>
-                                <ul class="submenu">
-                                    <li><a href="">Body Lotion & Creams</a></li>
-                                    <li><a href="">Facial Cleansers </a></li>
-                                    <li><a href="">Facial Treatments</a></li>
-                                </ul>
-                            </li>
-
-                            <li><a href="">Hair Care Products</a>
-                                <ul class="submenu">
-                                    <li><a href="/shampooAndConditioners">Shampoo & Conditioners</a></li>
-                                    <li><a href="/hairTreatments">Hair Treatments</a></li>
-                                    <li><a href="/stylingTools">Styling Tools</a></li>
-                                </ul>
-                            </li>
-
-                            <li><a href="">Electronics</a>
-                                <ul class="submenu">
-                                    <li><a href="/laptopComputers">Laptop Computers</a></li>
-                                    <li><a href="/desktopComputers">Desktop Computers</a></li>
-                                    <li><a href="/cellPhonesAndAccessories">Cell phones & Accessories</a></li>
-                                </ul>
-                            </li>
+                        <ul>
+                            <li><a class="active" href="/">Categories</a></li>
+                            <li><a href="/?cat_id=Fashion-Men">Fashion-Men</a></li>
+                            <li><a href="/?cat_id=Fashion-Women">Fashion-Women</a></li>
+                            <li><a href="/?cat_id=Fashion-Children">Fashion-Children</a></li>
+                            <li><a href="/?cat_id=Beauty-SkinCare">Beauty-SkinCare</a></li>
+                            <li><a href="/?cat_id=Beauty-HairCare">Beauty-HairCare</a></li>
+                            <li><a href="/?cat_id=Beauty-Cosmetics">Beauty-Cosmetics</a></li>
+                            <li><a href="/?cat_id=Electronics-Computers and Tablets">Electronics-Computers and Tablets</a></li>
+                            <li><a href="/?cat_id=Electronics-TV and Audio">Electronics-TV and Audio</a></li>
+                            <li><a href="/?cat_id=Cell Phones and Accessories">Cell Phones and Accessories</a></li>
                         </ul>
+
                     </div>
                 </div>
                 <!-- END col-3 column END -->
 
-                <div class="col-7" style="border: 3px solid brown">
+                <div class="col-8" style="border: 3px solid brown">
                     <div class="column-2">
                         <% for(let i = 0; i < uniqueCategories.length; i++) { %>
                             <div class="row">
@@ -96,32 +52,32 @@
                                 <div class="row-config">
                                     <% products.forEach(product => { %>
                                         <% if (product.data().ProductCategory === uniqueCategories[i]) { %>
-                                                <div class="oneCard each-card">
-                                                    <div class="card" style="width: 18rem;">
-                                                        <img class="img-config" class="card_row" class="card-img-top" src="<%= product.data().ProductUrl %>" alt="Missing Image">
-                                                        <div class="card-body">
-                                                            <h5 class="card-title">
-                                                                <a href="/productdetail?_id=<%= product.id %>" class="card-link" role="button">
-                                                                    <%= product.data().ProductTitle %>
-                                                                </a>
-                                                            </h5>
-                                                            <p class="card-text desc-limit">
-                                                                <%= product.data().ProductDescription %>
-                                                            </p>
+                                            <div class="oneCard each-card">
+                                                <div class="card" style="width: 18rem;">
+                                                    <img class="img-config" class="card_row" class="card-img-top" src="<%= product.data().ProductUrl %>" alt="Missing Image">
+                                                    <div class="card-body">
+                                                        <h5 class="card-title">
+                                                            <a href="/productdetail?_id=<%= product.id %>" class="card-link" role="button">
+                                                                <%= product.data().ProductTitle %>
+                                                            </a>
+                                                        </h5>
+                                                        <p class="card-text desc-limit">
+                                                            <%= product.data().ProductDescription %>
+                                                        </p>
 
-                                                            <form action='/add2cart' method="POST">
-                                                                <input type="hidden" name="id" value="<%= product.id %>">
-                                                                <input type="hidden" name="title" value="<%= product.data().ProductTitle %>">
-                                                                <input type="hidden" name="price" value="<%= product.data().ProductPrice %>">
-                                                                <input type="hidden" name="image" value="<%= product.data().ProductImage %>">
-                                                                <input type="hidden" name="imageurl" value="<%= product.data().ProductUrl %>">
-                                                                <a href="#" onclick="this.parentNode.submit()" class="btn btn-outline-secondary">Add To Cart</a>
-                                                            </form>
-                                                        </div>
+                                                        <form action='/add2cart' method="POST">
+                                                            <input type="hidden" name="id" value="<%= product.id %>">
+                                                            <input type="hidden" name="title" value="<%= product.data().ProductTitle %>">
+                                                            <input type="hidden" name="price" value="<%= product.data().ProductPrice %>">
+                                                            <input type="hidden" name="image" value="<%= product.data().ProductImage %>">
+                                                            <input type="hidden" name="imageurl" value="<%= product.data().ProductUrl %>">
+                                                            <a href="#" onclick="this.parentNode.submit()" class="btn btn-outline-secondary">Add To Cart</a>
+                                                        </form>
                                                     </div>
                                                 </div>
+                                            </div>
                                             <% } %>
-                                        <% }) %>
+                                                <% }) %>
                                 </div>
                             </div>
                             <%   } %>

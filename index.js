@@ -1,5 +1,3 @@
-
-
 // All npm imports
 const express = require('express')
 const functions = require('firebase-functions');
@@ -14,7 +12,7 @@ const nodemailer = require('nodemailer')
 const session = require('express-session')
 const fs = require('fs')
 const utils = require('./utils.js')
-var {Storage} = require('@google-cloud/storage')
+var { Storage } = require('@google-cloud/storage')
 const storage = new Storage({
     projectId: 'serinde-dae45',
     keyFilename: 'serinde-dae45-firebase-adminsdk-z0zyl-2c11c31be9.json'
@@ -99,7 +97,7 @@ app.post('/changeemail', auth, (req, res) => {
     const oldEmail = firebase.auth().currentUser.email
     const userEmail = req.body.email
     if (oldEmail == userEmail) {
-        return res.redirect('/userprofile', {nav: 'storefront', fb: firebase})
+        return res.redirect('/userprofile', { nav: 'storefront', fb: firebase })
     }
     firebase.auth().currentUser.updateEmail(userEmail)
         .then(result => {
@@ -118,16 +116,16 @@ app.post('/changeemail', auth, (req, res) => {
                             users.doc(oldEmail).delete() // deleting old email document
                             users.doc(userEmail).get().then(doc => { // getting new information to send to profile
                                 data = doc.data()
-                                res.render('userprofile', { data,nav: 'userprofile', fb: firebase })
+                                res.render('userprofile', { data, nav: 'userprofile', fb: firebase })
                             })
                         }) // creating another doc with the same data
 
                 }
             })
 
-            sellers.get().then(sellersSnap=>{
-                sellersSnap.forEach(seller =>{
-                    if(seller.data().Email == oldEmail){
+            sellers.get().then(sellersSnap => {
+                sellersSnap.forEach(seller => {
+                    if (seller.data().Email == oldEmail) {
                         var newData = seller.data()
                         newData.Email = userEmail
                         sellers.doc(seller.id).set(newData) // updating seller email to new email change
@@ -268,14 +266,14 @@ const imageUpload = multer({
 
 app.post('/sellerprofilesetup', auth, (req, res) => {
     const CompanyLocation = req.body.clocation
-    const CompanyName = req.body.cname 
+    const CompanyName = req.body.cname
 
     sellers.doc().set({
-        Email : firebase.auth().currentUser.email,
+        Email: firebase.auth().currentUser.email,
         CompanyName,
         CompanyLocation,
-        ProfilePicUrl : ""
-    }).then(result=>{
+        ProfilePicUrl: ""
+    }).then(result => {
         res.redirect('/sellerprofile')
     })
 })
@@ -308,7 +306,7 @@ app.get('/sellerprofile', auth, (req, res) => {
                         seller,
                         utils,
                         source: 'sellerprofile',
-                        nav:'storefront',
+                        nav: 'storefront',
                         fb: firebase
                     })
                 })
@@ -380,39 +378,40 @@ app.post('/sellerprofile/productupdate', (req, res) => {
                 })
             })
         } else {
-            storage.bucket('gs://serinde-dae45.appspot.com').upload('./'+req.file.path).then(result=>{
-            storage.bucket('gs://serinde-dae45.appspot.com').file(req.file.filename).getSignedUrl({                                                                      
-                action: 'read',                                                               
-                expires: '03-01-2500',                                                        
-              }).then(url=>{
-            sellers.get().then(sellersSnap => {
-                sellersSnap.forEach(seller => {
-                    if (firebase.auth().currentUser.email == seller.data().Email) {
-                        const productId = req.body.id;
-                        let data = {
-                            ProductCategory: req.body.category,
-                            ProductDescription: req.body.description,
-                            ProductImage: req.file.filename,
-                            ProductPrice: req.body.price,
-                            ProductTitle: req.body.title,
-                            ProductUrl: url[0],
-                            SellerId: seller.id
-                        }
+            storage.bucket('gs://serinde-dae45.appspot.com').upload('./' + req.file.path).then(result => {
+                storage.bucket('gs://serinde-dae45.appspot.com').file(req.file.filename).getSignedUrl({
+                    action: 'read',
+                    expires: '03-01-2500',
+                }).then(url => {
+                    sellers.get().then(sellersSnap => {
+                        sellersSnap.forEach(seller => {
+                            if (firebase.auth().currentUser.email == seller.data().Email) {
+                                const productId = req.body.id;
+                                let data = {
+                                    ProductCategory: req.body.category,
+                                    ProductDescription: req.body.description,
+                                    ProductImage: req.file.filename,
+                                    ProductPrice: req.body.price,
+                                    ProductTitle: req.body.title,
+                                    ProductUrl: url[0],
+                                    SellerId: seller.id
+                                }
 
-                        productsCollection.doc(productId).set(data)
-                            .then(result => {
-                                res.redirect('/sellerprofile')
-                            })
-                            .catch(error => {
-                                res.render('errorpage', {
-                                    source: '/sellerprofile#products',
-                                    error
-                                });
-                            })
-                    }
+                                productsCollection.doc(productId).set(data)
+                                    .then(result => {
+                                        res.redirect('/sellerprofile')
+                                    })
+                                    .catch(error => {
+                                        res.render('errorpage', {
+                                            source: '/sellerprofile#products',
+                                            error
+                                        });
+                                    })
+                            }
+                        })
+                    })
                 })
             })
-            })})
         }
     })
 })
@@ -426,45 +425,45 @@ app.post('/sellerprofile/productadd', (req, res) => {
             return res.render('errorpage', { message: 'No file selected' });
         }
 
-        storage.bucket('gs://serinde-dae45.appspot.com').upload('./'+req.file.path).then(result=>{
-            storage.bucket('gs://serinde-dae45.appspot.com').file(req.file.filename).getSignedUrl({                                                                      
-                action: 'read',                                                               
-                expires: '03-01-2500',                                                        
-              }).then(url=>{
-                sellers.get().then(sellersSnap=>{
-                    sellersSnap.forEach(seller =>{
+        storage.bucket('gs://serinde-dae45.appspot.com').upload('./' + req.file.path).then(result => {
+                storage.bucket('gs://serinde-dae45.appspot.com').file(req.file.filename).getSignedUrl({
+                    action: 'read',
+                    expires: '03-01-2500',
+                }).then(url => {
+                    sellers.get().then(sellersSnap => {
+                        sellersSnap.forEach(seller => {
 
-                        if(firebase.auth().currentUser.email == seller.data().Email){
-                            let data = {
-                                ProductCategory: req.body.category,
-                                ProductDescription: req.body.description,
-                                ProductImage: req.file.filename,
-                                ProductPrice: req.body.price,
-                                ProductTitle: req.body.title,
-                                ProductUrl: url[0],
-                                SellerId: seller.id
+                            if (firebase.auth().currentUser.email == seller.data().Email) {
+                                let data = {
+                                    ProductCategory: req.body.category,
+                                    ProductDescription: req.body.description,
+                                    ProductImage: req.file.filename,
+                                    ProductPrice: req.body.price,
+                                    ProductTitle: req.body.title,
+                                    ProductUrl: url[0],
+                                    SellerId: seller.id
+                                }
+
+                                productsCollection.doc().set(data)
+                                    .then(result => {
+                                        return res.redirect('/sellerprofile')
+                                    })
+                                    .catch(error => {
+                                        return res.render('errorpage', {
+                                            source: '/sellerprofile#products',
+                                            error
+                                        });
+                                    })
                             }
-        
-                            productsCollection.doc().set(data)
-                                .then(result => {
-                                    return res.redirect('/sellerprofile')
-                                })
-                                .catch(error => {
-                                    return res.render('errorpage', {
-                                        source: '/sellerprofile#products',
-                                        error
-                                    });
-                                })
-                        }
+                        })
                     })
+                }).catch(error => {
+                    return res.render('errorpage', { message: error.message });
                 })
-            }).catch(error=>{
-                return res.render('errorpage', { message: error.message});
             })
-        })
-        .catch(error=>{
-            return res.render('errorpage', { message: error.message});
-        })
+            .catch(error => {
+                return res.render('errorpage', { message: error.message });
+            })
     })
 })
 
@@ -577,7 +576,7 @@ app.post('/add2cart', auth, (req, res) => {
     req.session.sc = sc.serialize();
 
     res.redirect('/cart');
-}) 
+})
 
 app.post('/removeFromCart', (req, res) => {
 
@@ -624,7 +623,7 @@ app.get('/test', (req,res) => {
 //----------------------------------
 // CHARGE CREDIT CARD GET ROUTE
 //----------------------------------
-app.post('/charge', (req,res) => {
+app.post('/charge', (req, res) => {
 
     //create the customer that paid and render success page
     stripe.customers.create({
@@ -802,55 +801,64 @@ app.get('/', (_req, res) => {
     var products = []
     var categories = []
     var uniqueCategories = []
+
     productsCollection.get()
         .then(productSnap => {
             productSnap.forEach(singleProduct => {
                     //store categories and products
-                    categories.push(singleProduct.data().ProductCategory)
-                    products.push(singleProduct)
+
+                    if (_req.query.cat_id != undefined) {
+                        if (_req.query.cat_id == singleProduct.data().ProductCategory) {
+                            categories.push(singleProduct.data().ProductCategory)
+                            products.push(singleProduct)
+                        }
+                    } else {
+                        categories.push(singleProduct.data().ProductCategory)
+                        products.push(singleProduct)
+                    }
                 })
                 //filter by unique categories
             uniqueCategories = Array.from(new Set(categories))
                 //console.log(uniqueCategories)
 
-            if(firebase.auth().currentUser){// rendering different homepage for admins
-                if(isAdmin(firebase.auth().currentUser.email)){
-                res.render('adminstorefront', {
-                    nav: 'adminstorefront',
-                    fb: firebase,
-                    products,
-                    uniqueCategories,
-                    images: storage.bucket('gs://serinde-dae45.appspot.com')
-                });
-              }
+            if (firebase.auth().currentUser) { // rendering different homepage for admins
+                if (isAdmin(firebase.auth().currentUser.email)) {
+                    res.render('adminstorefront', {
+                        nav: 'adminstorefront',
+                        fb: firebase,
+                        products,
+                        uniqueCategories,
+                        images: storage.bucket('gs://serinde-dae45.appspot.com')
+                    });
+                }
             }
-                res.render('storefront', {
-                    nav: 'storefront',
-                    fb: firebase,
-                    products,
-                    uniqueCategories,
-                    images: storage.bucket('gs://serinde-dae45.appspot.com')
-                });
+            res.render('storefront', {
+                nav: 'storefront',
+                fb: firebase,
+                products,
+                uniqueCategories,
+                images: storage.bucket('gs://serinde-dae45.appspot.com')
+            });
         })
         .catch(error => {
             console.log('????')
             res.render('errorpage', { message: error.message })
         })
 
+})
 
+//----------------------------------
+// CONTACT PAGE GET ROUTE
+//----------------------------------
+app.get('/contact', (req, res) => {
+    res.render('main.handlebars', { nav: 'storefront', fb: firebase });
+});
 
-    //----------------------------------
-    // CONTACT PAGE GET ROUTE
-    //----------------------------------
-    app.get('/contact', (req, res) => {
-        res.render('main.handlebars', { nav: 'storefront', fb: firebase });
-    });
-
-    //==========================================================
-    //nodemailer configuration starts..
-    //==========================================================
-    app.post('/send', (req, res) => {
-        const output = `
+//==========================================================
+//nodemailer configuration starts..
+//==========================================================
+app.post('/send', (req, res) => {
+    const output = `
       <p>You have a new contact request</p>
       <h3>Contact Details</h3>
       <ul>  
@@ -863,68 +871,71 @@ app.get('/', (_req, res) => {
       <p>${req.body.message}</p>
     `;
 
-        // create reusable transporter object using the default SMTP transport
-        let transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
+    // create reusable transporter object using the default SMTP transport
+    let transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
 
-            //port: 537 ,
-            //secure: false, // true for 465, false for other ports
-            auth: {
-                user: 'sumiayi@gmail.com', // generated ethereal user
-                pass: '987654321Ab' // generated ethereal password
-            },
-            // tls:{
-            //   rejectUnauthorized:false
-            // }
-        });
-
-        // setup email data with unicode symbols
-        let mailOptions = {
-            from: '"Nodemailer Contact" <sumiayi@gmail.com>', // sender address
-            to: 'priankasumia@yahoo.com', // list of receivers
-            subject: 'Node Contact Request', // Subject line
-            text: 'Hello world?', // plain text body
-            html: output // html body
-        };
-
-        // send mail with defined transport object
-        transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                return console.log(error);
-            }
-            console.log('Message sent: %s', info.messageId);
-            console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
-
-            res.render('main.handlebars', { msg: 'Email has been sent' });
-        });
+        //port: 537 ,
+        //secure: false, // true for 465, false for other ports
+        auth: {
+            user: 'sumiayi@gmail.com', // generated ethereal user
+            pass: '987654321Ab' // generated ethereal password
+        },
+        // tls:{
+        //   rejectUnauthorized:false
+        // }
     });
-    //==========================================================
-    //NODEMAILER CONFIG. ENDS
-    //==========================================================
-})
 
+    // setup email data with unicode symbols
+    let mailOptions = {
+        from: '"Nodemailer Contact" <sumiayi@gmail.com>', // sender address
+        to: 'priankasumia@yahoo.com', // list of receivers
+        subject: 'Node Contact Request', // Subject line
+        text: 'Hello world?', // plain text body
+        html: output // html body
+    };
+
+    // send mail with defined transport object
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            return console.log(error);
+        }
+        console.log('Message sent: %s', info.messageId);
+        console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+
+        res.render('main.handlebars', { msg: 'Email has been sent' });
+    });
+});
+//==========================================================
+//NODEMAILER CONFIG. ENDS
+//==========================================================
 
 app.get('/productdetail', (req, res) => {
-    const productId = req.query._id 
+    const productId = req.query._id
     var admin
-    if(firebase.auth().currentUser){
+    if (firebase.auth().currentUser) {
         admin = isAdmin(firebase.auth().currentUser.email)
-    }else{
+    } else {
         admin = false
     }
-    
+
 
     productsCollection.doc(productId).get()
-    .then(product => {
-        res.render('productdetail', {product, utils, fb: firebase, 
-            nav:'storefront', admin})//, admin : isAdmin(firebase.auth().currentUser.email)})
-    })
-    .catch(error => {
-        res.render('errorpage', { message: error.message, fb: firebase, nav: 'storefront' })
-    })
+        .then(product => {
+            res.render('productdetail', {
+                    product,
+                    utils,
+                    fb: firebase,
+                    nav: 'storefront',
+                    admin
+                }) //, admin : isAdmin(firebase.auth().currentUser.email)})
+        })
+        .catch(error => {
+            res.render('errorpage', { message: error.message, fb: firebase, nav: 'storefront' })
+        })
 })
 
-app.post('/addfromproductdetail', (req,res)=>{
+app.post('/addfromproductdetail', (req, res) => {
     const productid = req.body.productid
     const quantity = req.body.quantity
 
@@ -935,8 +946,8 @@ app.post('/addfromproductdetail', (req,res)=>{
         sc = ShoppingCart.deserialize(req.session.sc)
     }
 
-    productsCollection.doc(productid).get().then(product =>{
-        for(var i = 0; i < quantity; i++){
+    productsCollection.doc(productid).get().then(product => {
+        for (var i = 0; i < quantity; i++) {
             sc.add({
                 id: product.id,
                 title: product.data().ProductTitle,
@@ -951,8 +962,8 @@ app.post('/addfromproductdetail', (req,res)=>{
             fb: firebase
         });
     })
-    
-    
+
+
 })
 
 
@@ -994,88 +1005,88 @@ function isAdmin(email) {
 // ADMIN ROUTES
 //===================================================
 
-app.get('/adminsellers', adminAuth, (req,res)=>{
-    sellers.get().then(sellersSnapshot =>{
-        res.render('adminsellers', {sellers: sellersSnapshot, fb: firebase}) // sending sellers to EJS
+app.get('/adminsellers', adminAuth, (req, res) => {
+    sellers.get().then(sellersSnapshot => {
+        res.render('adminsellers', { sellers: sellersSnapshot, fb: firebase }) // sending sellers to EJS
     })
 })
 
-app.post('/admindeleteproduct', adminAuth, (req,res)=>{
+app.post('/admindeleteproduct', adminAuth, (req, res) => {
     const sender = req.body.sender
     const sellerid = req.body.sellerid
     const selleremail = req.body.selleremail
     const productid = req.body.productid
 
-    productsCollection.doc(productid).delete().then(result=>{
+    productsCollection.doc(productid).delete().then(result => {
 
-        if(sender == "admin"){
-            productsCollection.where("SellerId", "==", sellerid).get().then(productsFound =>{
-                res.render('adminproducts', {products: productsFound, fb:firebase, sellerid, selleremail})
+        if (sender == "admin") {
+            productsCollection.where("SellerId", "==", sellerid).get().then(productsFound => {
+                res.render('adminproducts', { products: productsFound, fb: firebase, sellerid, selleremail })
             })
-        }else if(sender == "storefront"){
+        } else if (sender == "storefront") {
             res.redirect('/')
         }
 
-    }).catch(error=>{
-        res.render('errorpage', {message: error.message})
+    }).catch(error => {
+        res.render('errorpage', { message: error.message })
     })
 })
 
-app.post('/adminclearseller', adminAuth,(req,res) =>{
+app.post('/adminclearseller', adminAuth, (req, res) => {
     const sellerid = req.body.sellerid
-    productsCollection.get().then(products =>{
-        products.forEach(product=>{
-            if(product.data().SellerId == sellerid){
+    productsCollection.get().then(products => {
+        products.forEach(product => {
+            if (product.data().SellerId == sellerid) {
                 productsCollection.doc(product.id).delete()
             }
         })
-        sellers.doc(sellerid).delete().then(result=>{
+        sellers.doc(sellerid).delete().then(result => {
             res.redirect('/adminsellers')
         })
     })
 })
 
-app.post('/adminproducts', adminAuth, (req,res)=>{
+app.post('/adminproducts', adminAuth, (req, res) => {
     const sellerid = req.body.sellerid
     const selleremail = req.body.selleremail
 
-    productsCollection.where("SellerId", "==", sellerid).get().then(productsFound =>{
-        res.render('adminproducts', {products: productsFound, fb:firebase, sellerid, selleremail})
+    productsCollection.where("SellerId", "==", sellerid).get().then(productsFound => {
+        res.render('adminproducts', { products: productsFound, fb: firebase, sellerid, selleremail })
     })
 })
 
-app.get('/adminusers', adminAuth, (req,res)=>{
-    users.get().then(usersSnapshot =>{
-        res.render('adminusers', {users: usersSnapshot, fb: firebase}) // sending users to EJS
+app.get('/adminusers', adminAuth, (req, res) => {
+    users.get().then(usersSnapshot => {
+        res.render('adminusers', { users: usersSnapshot, fb: firebase }) // sending users to EJS
     })
 })
 
-app.post('/adminuserreset', adminAuth, (req,res)=>{
+app.post('/adminuserreset', adminAuth, (req, res) => {
     const email = req.body.email
-    firebase.auth().sendPasswordResetEmail(email).then(result=>{
+    firebase.auth().sendPasswordResetEmail(email).then(result => {
         res.redirect('/adminusers')
-    }).catch(error=>{
-        res.render('errorpage', {message : error.message})
+    }).catch(error => {
+        res.render('errorpage', { message: error.message })
     })
 })
 
-app.post('/adminuserdelete', adminAuth, (req,res)=>{
+app.post('/adminuserdelete', adminAuth, (req, res) => {
 
     const email = req.body.email
 
-    admin.auth().getUserByEmail(email).then(user=>{
-        sellers.get().then(sellersSnapshot=>{
-            sellersSnapshot.forEach(seller=>{
-                if(seller.data().Email == email){
-                    productsCollection.get().then(productSnapshot=>{
-                        productSnapshot.forEach(product=>{
-                            if(product.data().SellerId == seller.id){
+    admin.auth().getUserByEmail(email).then(user => {
+        sellers.get().then(sellersSnapshot => {
+            sellersSnapshot.forEach(seller => {
+                if (seller.data().Email == email) {
+                    productsCollection.get().then(productSnapshot => {
+                        productSnapshot.forEach(product => {
+                            if (product.data().SellerId == seller.id) {
                                 productsCollection.doc(product.id).delete()
                             }
                         })
                     })
-                    sellers.doc(seller.id).delete().then(result=>{
-                        admin.auth().deleteUser(user.uid).then(result=>{
+                    sellers.doc(seller.id).delete().then(result => {
+                        admin.auth().deleteUser(user.uid).then(result => {
                             users.doc(email).delete()
                             res.redirect('/adminusers')
                         })
