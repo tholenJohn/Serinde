@@ -53,6 +53,10 @@ app.use('/public', express.static(pa.join(__dirname + '/public')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
+//email config file
+var emailContents = fs.readFileSync("email.json");
+var jsonEmailContents = JSON.parse(emailContents);
+
 
 //----------------------------------
 // PORT ROUTE
@@ -713,11 +717,13 @@ app.post('/charge', (req, res) => {
         })
         })
         //sending email to current user that purchased information
+        var emailerPass = jsonEmailContents.pass;
+        var emailerEmail = jsonEmailContents.email;
         var transporter = nodemailer.createTransport({
             host: 'smtp.gmail.com',
             auth: {
-                user: 'tholenjohn@gmail.com', // generated ethereal user
-                pass: 'Ded4hibyee' // generated ethereal password
+                user: emailerEmail,
+                pass: emailerPass
             },
         });
         
