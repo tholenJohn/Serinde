@@ -687,10 +687,6 @@ app.post('/charge', (req, res) => {
                     - price[0])
                     /range_price[range_price.length-1]);
                 price = [];
-                console.log(means[means.length-1])
-                console.log(totals[totals.length-1])
-                console.log(currentProductPrice[iter])
-                console.log(normalizedprice[normalizedprice.length - 1])
             }
             iter++;
         };
