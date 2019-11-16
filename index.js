@@ -803,16 +803,12 @@ app.get('/', (_req, res) => {
     var uniqueCategories = []
 
     // arrays to use for recommendation engine
-    var highItems = []
-    var lowItems = []
-    var midItems = []
     var tempProducts = []
     var recommendedRange
 
 
     // Recommendation engine
     let train = new Training()
-
 
     // get user's purchases and push them into 4 arrays
     if(firebase.auth().currentUser) {
@@ -860,22 +856,32 @@ app.get('/', (_req, res) => {
                     products = [...tempProducts]
                 } else if (recommendedRange === 'mid') {
 
+                    var within = []
+                    var outside = []
+
                     // filter all prices of items in this category
                     var allPrices = tempProducts.map(tempProduct => parseFloat(tempProduct.data().ProductPrice))
-
-                    // get total of all prices
-                    var reducer = (accumulator, currentValue) => accumulator + currentValue;
-                    var total = allPrices.reduce(reducer)
+                    var allSorted = allPrices.sort()
                     
-                    //get mid 1 and 2 values
-                    var mid1 = total * 34
-                    var mid2 = total * 67
-
-                    
-                    
+                    var mini = allSorted[0]
+                    var maxi = allSorted[allSorted.length - 1]
+                    var divisor = maxi - mini
 
 
-                    products = [...tempProducts]
+                    // filter within range to get array of items and push into products
+                    for (let i = 0; i < tempProducts.length; i++) {
+                        if( (tempProducts[i].data().ProductPrice - mini)/divisor > 0.33 && (tempProducts[i].data().ProductPrice - mini)/divisor <= 0.66) {
+                            within.push(tempProducts[i])
+                            tempProducts.splice(i, 1)
+                            i = 0
+                        } 
+                    }
+                    products = [...within]
+
+                    for (let i = 0; i < tempProducts.length; i++) {
+                        products.push(tempProducts[i])
+                    }
+
                 } else {
                     products = [...tempProducts]
                 }
