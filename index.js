@@ -55,6 +55,10 @@ app.use('/public', express.static(pa.join(__dirname + '/public')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
+//email config file
+var emailContents = fs.readFileSync("email.json");
+var jsonEmailContents = JSON.parse(emailContents);
+
 
 //----------------------------------
 // PORT ROUTE
@@ -681,9 +685,9 @@ app.post('/charge', (req, res) => {
                 means.push(totals[totals.length - 1]/price.length);
                 price.sort();
                 range_price.push(price[price.length-1] - price[0]);
-                normalizedprice.push(Math.abs((means[means.length - 1]
-                    - currentProductPrice[iter])
-                    /range_price[range_price.length-1]));
+                normalizedprice.push((currentProductPrice[iter]
+                    - price[0])
+                    /range_price[range_price.length-1]);
                 price = [];
             }
             iter++;
@@ -693,6 +697,7 @@ app.post('/charge', (req, res) => {
             var calcMid = 0;
             var calcLow = 0;
             for(var i = 0; i < ids.length; i++) {
+                
                 if(normalizedprice[i] > 0.66) {
                     calcHigh = 1;
                     calcLow = calcMid = 0;
@@ -715,11 +720,13 @@ app.post('/charge', (req, res) => {
         })
         })
         //sending email to current user that purchased information
+        var emailerPass = jsonEmailContents.pass;
+        var emailerEmail = jsonEmailContents.email;
         var transporter = nodemailer.createTransport({
             host: 'smtp.gmail.com',
             auth: {
-                user: 'tholenjohn@gmail.com', // generated ethereal user
-                pass: 'Ded4hibyee' // generated ethereal password
+                user: emailerEmail,
+                pass: emailerPass
             },
         });
         
@@ -924,7 +931,7 @@ app.get('/', (_req, res) => {
 
             if (firebase.auth().currentUser) { // rendering different homepage for admins
                 if (isAdmin(firebase.auth().currentUser.email)) {
-                    res.render('adminstorefront', {
+                    return res.render('adminstorefront', {
                         nav: 'adminstorefront',
                         fb: firebase,
                         products,
@@ -940,6 +947,7 @@ app.get('/', (_req, res) => {
                 uniqueCategories,
                 images: storage.bucket('gs://serinde-dae45.appspot.com')
             });
+
         })
         .catch(error => {
             console.log('????')
@@ -1202,17 +1210,55 @@ app.post('/adminuserdelete', adminAuth, (req, res) => {
     })
 })
 
-//===================================================
-// SEARCH BAR SUBMIT BUTTON REDIRECT FUNCTION
-//===================================================
+//================================
+// SEARCH BAR SUBMIT BUTTON 
+//================================
 
-function redirect() {
-    document.location.href = '/browse/' + document.getElementById('search').value;
-    return false;
-}
+app.get('/search', (_req, res) => {
+    var products = []
+    var categories = []
+    var uniqueCategories = []
 
-app.get('/browse', (req, res) => {
-    res.render('search');
-});
+    productsCollection.get()
+        .then(productSnap => {
+            productSnap.forEach(singleProduct => {
 
-exports.app = functions.https.onRequest(app);
+                    //store categories and products
+                    if (_req.query.cat_id != undefined) {
+                        if (_req.query.cat_id == singleProduct.data().ProductCategory) {
+                            categories.push(singleProduct.data().ProductCategory)
+                            products.push(singleProduct)
+                        }
+                    } else {
+                        categories.push(singleProduct.data().ProductCategory)
+                        products.push(singleProduct)
+                    }
+                })
+                //filter by unique categories
+            uniqueCategories = Array.from(new Set(categories))
+
+            if (firebase.auth().currentUser) { // rendering different homepage for admins
+                if (isAdmin(firebase.auth().currentUser.email)) {
+                    res.render('/search', {
+                        nav: 'search',
+                        fb: firebase,
+                        products,
+                        uniqueCategories,
+                        images: storage.bucket('gs://serinde-dae45.appspot.com')
+                    });
+                }
+            }
+            res.render('search', {
+                nav: 'search',
+                fb: firebase,
+                products,
+                uniqueCategories,
+                images: storage.bucket('gs://serinde-dae45.appspot.com')
+            });
+        })
+        .catch(error => {
+            console.log('????')
+            res.render('errorpage', { message: error.message })
+        })
+
+})

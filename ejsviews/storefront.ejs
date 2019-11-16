@@ -40,7 +40,7 @@
                 </div>
                 <!-- END col-3 column END -->
 
-                <div class="col-8" style="border: 3px solid brown">
+                <div class="col-9" style="border: 1px solid brown ;">
                     <div class="column-2">
                         <% for(let i = 0; i < uniqueCategories.length; i++) { %>
                             <div class="row">
@@ -74,7 +74,7 @@
                                                             <input type="hidden" name="price" value="<%= product.data().ProductPrice %>">
                                                             <input type="hidden" name="image" value="<%= product.data().ProductImage %>">
                                                             <input type="hidden" name="imageurl" value="<%= product.data().ProductUrl %>">
-                                                            <a href="#" onclick="this.parentNode.submit()" class="btn btn-outline-secondary">Add To Cart</a>
+                                                            <a href="#" onclick="this.parentNode.submit()" class="btn btn-outline-primary">Add To Cart</a>
                                                         </form>
                                                     </div>
                                                 </div>
@@ -90,6 +90,20 @@
         </div>
 
         <%- include ../partials/scripts %>
+
+
+            <!-- CONTACT US -->
+
+            <footer class="border-top footer text-muted">
+                <div class="container">
+                    <!-- Contact Us-->
+
+                    <div class="nav-item <%= nav == 'contact' ? 'active' : ''%>">
+                        <a class="nav-link" href="/contact">Contact Us</a>
+                    </div>
+                    &copy; 2019 - Serinde
+                </div>
+            </footer>
 </body>
 
 </html>
