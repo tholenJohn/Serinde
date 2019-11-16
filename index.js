@@ -1095,17 +1095,55 @@ app.post('/adminuserdelete', adminAuth, (req, res) => {
     })
 })
 
-//===================================================
-// SEARCH BAR SUBMIT BUTTON REDIRECT FUNCTION
-//===================================================
+//================================
+// SEARCH BAR SUBMIT BUTTON 
+//================================
 
-function redirect() {
-    document.location.href = '/browse/' + document.getElementById('search').value;
-    return false;
-}
+app.get('/search', (_req, res) => {
+    var products = []
+    var categories = []
+    var uniqueCategories = []
 
-app.get('/browse', (req, res) => {
-    res.render('search');
-});
+    productsCollection.get()
+        .then(productSnap => {
+            productSnap.forEach(singleProduct => {
 
-exports.app = functions.https.onRequest(app);
+                    //store categories and products
+                    if (_req.query.cat_id != undefined) {
+                        if (_req.query.cat_id == singleProduct.data().ProductCategory) {
+                            categories.push(singleProduct.data().ProductCategory)
+                            products.push(singleProduct)
+                        }
+                    } else {
+                        categories.push(singleProduct.data().ProductCategory)
+                        products.push(singleProduct)
+                    }
+                })
+                //filter by unique categories
+            uniqueCategories = Array.from(new Set(categories))
+
+            if (firebase.auth().currentUser) { // rendering different homepage for admins
+                if (isAdmin(firebase.auth().currentUser.email)) {
+                    res.render('/search', {
+                        nav: 'search',
+                        fb: firebase,
+                        products,
+                        uniqueCategories,
+                        images: storage.bucket('gs://serinde-dae45.appspot.com')
+                    });
+                }
+            }
+            res.render('search', {
+                nav: 'search',
+                fb: firebase,
+                products,
+                uniqueCategories,
+                images: storage.bucket('gs://serinde-dae45.appspot.com')
+            });
+        })
+        .catch(error => {
+            console.log('????')
+            res.render('errorpage', { message: error.message })
+        })
+
+})
