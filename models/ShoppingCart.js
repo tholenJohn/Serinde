@@ -26,7 +26,17 @@ class ShoppingCart {
             }
         }
     }
-
+    //get product names
+    getProductsNames(){
+        var itemIDs = [];
+        
+        //counting how many items exist
+        for(const item of this.items){ 
+            itemIDs.push(item.product.id);
+        }
+        var half_length = itemIDs.length/2;
+        return itemIDs;
+    }
     serialize() {
         return this.items;
     }
