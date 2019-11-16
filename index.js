@@ -821,7 +821,7 @@ app.get('/', (_req, res) => {
 
             if (firebase.auth().currentUser) { // rendering different homepage for admins
                 if (isAdmin(firebase.auth().currentUser.email)) {
-                    res.render('adminstorefront', {
+                    return res.render('adminstorefront', {
                         nav: 'adminstorefront',
                         fb: firebase,
                         products,
@@ -837,6 +837,7 @@ app.get('/', (_req, res) => {
                 uniqueCategories,
                 images: storage.bucket('gs://serinde-dae45.appspot.com')
             });
+
         })
         .catch(error => {
             console.log('????')
