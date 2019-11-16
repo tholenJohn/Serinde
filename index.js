@@ -11,6 +11,7 @@ const pa = require('path')
 const nodemailer = require('nodemailer')
 const session = require('express-session')
 const fs = require('fs')
+const brain = require('brain.js')
 const utils = require('./utils.js')
 var { Storage } = require('@google-cloud/storage')
 const storage = new Storage({
@@ -19,6 +20,7 @@ const storage = new Storage({
 });
 
 const ShoppingCart = require('./models/ShoppingCart.js');
+const Training = require('./training.js')
 
 // Firebase initialization
 const serviceAccount = require("./serinde-dae45-firebase-adminsdk-z0zyl-2c11c31be9.json")
@@ -788,13 +790,120 @@ app.post('/charge', (req, res) => {
 //----------------------------------
 
 app.get('/', (_req, res) => {
+    // arrays to display products of each category
     var products = []
     var categories = []
     var uniqueCategories = []
 
-    //if(firebase.auth().currentUser) {console.log(firebase.auth().currentUser.email) }
+    // arrays to use for recommendation engine
+    var highItems = []
+    var lowItems = []
+    var midItems = []
+    var tempProducts = []
+    var recommendedRange
 
-    productsCollection.get()
+
+    // Recommendation engine
+    let train = new Training()
+
+
+    // get user's purchases and push them into 4 arrays
+    if(firebase.auth().currentUser) {
+        users.doc(firebase.auth().currentUser.email).collection('bought').get()
+            .then(purchaseSnap => {
+                if(purchaseSnap != undefined) {
+                    purchaseSnap.forEach(purchase => {
+                        // add the category and range values to training set and get recommended range
+                        train.addItems(purchase.data().ProductCategory)
+                        train.addRange(purchase.data().high, purchase.data().low, purchase.data().mid)
+                        recommendedRange = train.getRange(_req.query.cat_id)
+                    })
+                }
+            }).then(
+                productsCollection.get()
+                    .then(productSnap => {
+                        productSnap.forEach(singleProduct => {
+                                //store categories and products
+                                if (_req.query.cat_id != undefined) {
+                                    if (_req.query.cat_id == singleProduct.data().ProductCategory) {
+                                        categories.push(singleProduct.data().ProductCategory)
+                                        tempProducts.push(singleProduct)
+                                    }
+                                } else {
+                                    categories.push(singleProduct.data().ProductCategory)
+                                    products.push(singleProduct)
+                                }
+                            })
+                //filter by unique categories
+                uniqueCategories = Array.from(new Set(categories))
+                //console.log(uniqueCategories)
+
+            
+            // assign products based on the result of recommendation engine
+            if (_req.query.cat_id != undefined) {
+                console.log(recommendedRange)
+ 
+                if (recommendedRange === 'low') {
+                    // sort array of products in ascending order when low value is preferred
+                    tempProducts.sort((a,b) => parseFloat(a.data().ProductPrice) - parseFloat(b.data().ProductPrice))
+                    products = [...tempProducts]
+                } else if (recommendedRange === 'high') {
+                    // sort array of products in descending order when high value is preferred
+                    tempProducts.sort((a,b) => parseFloat(b.data().ProductPrice) - parseFloat(a.data().ProductPrice))
+                    products = [...tempProducts]
+                } else if (recommendedRange === 'mid') {
+
+                    // filter all prices of items in this category
+                    var allPrices = tempProducts.map(tempProduct => parseFloat(tempProduct.data().ProductPrice))
+
+                    // get total of all prices
+                    var reducer = (accumulator, currentValue) => accumulator + currentValue;
+                    var total = allPrices.reduce(reducer)
+                    
+                    //get mid 1 and 2 values
+                    var mid1 = total * 34
+                    var mid2 = total * 67
+
+                    
+                    
+
+
+                    products = [...tempProducts]
+                } else {
+                    products = [...tempProducts]
+                }
+                
+            }
+
+
+
+            if (firebase.auth().currentUser) { // rendering different homepage for admins
+                if (isAdmin(firebase.auth().currentUser.email)) {
+                    res.render('adminstorefront', {
+                        nav: 'adminstorefront',
+                        fb: firebase,
+                        products,
+                        uniqueCategories,
+                        images: storage.bucket('gs://serinde-dae45.appspot.com')
+                    });
+                }
+            }
+            res.render('storefront', {
+                nav: 'storefront',
+                fb: firebase,
+                products,
+                uniqueCategories,
+                images: storage.bucket('gs://serinde-dae45.appspot.com')
+            });
+        })
+        .catch(error => {
+            console.log('????')
+            res.render('errorpage', { message: error.message })
+        })
+            ) 
+    } else {
+        //for unregistered users don't train anything, just show items as normal
+        productsCollection.get()
         .then(productSnap => {
             productSnap.forEach(singleProduct => {
                     //store categories and products
@@ -836,6 +945,10 @@ app.get('/', (_req, res) => {
             console.log('????')
             res.render('errorpage', { message: error.message })
         })
+    }
+
+
+    
 
 })
 
