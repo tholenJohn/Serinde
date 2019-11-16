@@ -798,6 +798,8 @@ app.get('/', (_req, res) => {
     var categories = []
     var uniqueCategories = []
 
+    //if(firebase.auth().currentUser) {console.log(firebase.auth().currentUser.email) }
+
     productsCollection.get()
         .then(productSnap => {
             productSnap.forEach(singleProduct => {
@@ -814,7 +816,7 @@ app.get('/', (_req, res) => {
                     }
                 })
                 //filter by unique categories
-            uniqueCategories = Array.from(new Set(categories))
+                uniqueCategories = Array.from(new Set(categories))
                 //console.log(uniqueCategories)
 
             if (firebase.auth().currentUser) { // rendering different homepage for admins
