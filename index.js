@@ -683,10 +683,14 @@ app.post('/charge', (req, res) => {
                 means.push(totals[totals.length - 1]/price.length);
                 price.sort();
                 range_price.push(price[price.length-1] - price[0]);
-                normalizedprice.push(Math.abs((means[means.length - 1]
-                    - currentProductPrice[iter])
-                    /range_price[range_price.length-1]));
+                normalizedprice.push((currentProductPrice[iter]
+                    - price[0])
+                    /range_price[range_price.length-1]);
                 price = [];
+                console.log(means[means.length-1])
+                console.log(totals[totals.length-1])
+                console.log(currentProductPrice[iter])
+                console.log(normalizedprice[normalizedprice.length - 1])
             }
             iter++;
         };
@@ -695,6 +699,7 @@ app.post('/charge', (req, res) => {
             var calcMid = 0;
             var calcLow = 0;
             for(var i = 0; i < ids.length; i++) {
+                
                 if(normalizedprice[i] > 0.66) {
                     calcHigh = 1;
                     calcLow = calcMid = 0;
