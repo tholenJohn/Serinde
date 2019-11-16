@@ -4,7 +4,7 @@
   "description": "Capstone project - e-commerce platform",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jasmine",
     "start": "nodemon index.js"
   },
   "engines": {
@@ -37,6 +37,7 @@
     "firebase-functions": "^3.3.0",
     "fs": "0.0.1-security",
     "generate-password": "^1.4.2",
+    "jasmine": "^3.5.0",
     "multer": "^1.4.2",
     "nodemailer": "^6.3.0",
     "nodemon": "^1.19.2",
