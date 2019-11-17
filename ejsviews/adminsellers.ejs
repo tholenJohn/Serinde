@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <% include ../partials/header %>
+  <title>ADMIN HOME</title>
+</head>
+
+<body>
+        <h1>ADMIN <span class="badge badge-secondary">PRODUCTS</span></h1>
+    <div class="jumbotron">
+        <a href="/" class="btn btn-danger">Back</a>
+        <table class="table table-striped table-dark">
+                <thead>
+                  <tr>
+                    <th scope="col">Email</th>
+                    <th scope="col">Company Name</th>
+                    <th scope="col">Company Location</th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <%sellers.forEach(seller=>{%>
+                    <tr>
+                        <td><%=seller.data().Email%></td>
+                        <td><%=seller.data().CompanyName%></td>
+                        <td><%=seller.data().CompanyLocation%></td>
+                        <td>
+                            <form action="/adminproducts" method="POST">
+                                <input type="hidden" name="sellerid" value="<%=seller.id%>">
+                                <input type="hidden" name="selleremail" value="<%=seller.data().Email%>">
+                                   </br>
+                                <button type="submit" class="btn btn-warning">View Products</button>
+                            </form> 
+                        </td>
+                        <td>
+                            <form action="/adminclearseller" method="POST">
+                                <input type="hidden" name="sellerid" value="<%=seller.id%>">
+                                   </br>
+                                <button type="submit" class="btn btn-danger">CLEAR</button>
+                            </form> 
+                        </td>
+                    </tr>
+                  <%})%>
+                </tbody>
+              </table>
+    </div>
+  <% include ../partials/scripts %>
+</body>
+
+</html>

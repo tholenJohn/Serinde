@@ -17,7 +17,7 @@
                               <!-- DISPLAY EACH ITEM IN A CARD -->
                               <%products.forEach(product => {  %>
                               <div class="card" style="width: 28rem; margin: 2rem auto; border: 2px solid">
-                                  <img src="/./public/images/<%=product.data().ProductImage %>" height="100" width="100%" class="card-img-top" alt="<%= product.data().ProductTitle %>">
+                                  <img src="<%=product.data().ProductUrl %>" height="100" width="100%" class="card-img-top" alt="<%= product.data().ProductTitle %>">
                                   <div class="card-body">
                                     <h2 class="card-title"><%= product.data().ProductTitle %></h5>
                                     <h4 class="card-subtitle mb-2 text-muted"><%= utils.dollar.format(product.data().ProductPrice) %></h6>
@@ -76,7 +76,7 @@
                                         <%products.forEach(product => {  %>
                                         <tr>
                                             <td>
-                                                <img src="/./public/images/<%=product.data().ProductImage %>" height="50" width="50">
+                                                <img src="<%=product.data().ProductUrl %>" height="50" width="50">
                                             </td>
                                             <td>
                                                 <%= product.data().ProductTitle %>

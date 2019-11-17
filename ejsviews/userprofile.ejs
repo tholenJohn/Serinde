@@ -47,6 +47,9 @@
                         <a href="/changeemail" class="btn btn-primary">Change Email</a>
                     </div>
                     <div class="profile-userbuttons">
+                        <a href="/contact" class="btn btn-primary">Contact Us</a>
+                    </div>
+                    <div class="profile-userbuttons">
                         <a href="/" class="btn btn-danger">Back</a>
                     </div>
                 </div>
@@ -95,7 +98,7 @@
                                             <label for="image">Profile Pic</label> <br>
                                             <div style="position:relative;">
                                                 <a class='btn btn-primary' href='javascript:;'>
-                                                    <input type="file" name="file_source" onchange='$("#upload-file-info").html($(this).val());'>
+                                                    <input type="file" id="file_source" name="file_source" onchange='$("#upload-file-info").html($(this).val());'>
                                                 </a>
                                                 <span class='label label-info' id="upload-file-info"></span>
                                             </div>

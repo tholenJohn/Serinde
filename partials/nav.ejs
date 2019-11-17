@@ -1,5 +1,12 @@
 <link rel="stylesheet" type="li/css" href="../public/css/nav.css">
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+
+
+<nav class="navbar navbar-expand-lg navbar-light" style="background-color: #d0def5">
+
+
+    <!--
+<nav class="navbar-default" style="background-color: red">
+-->
 
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
 					  <span class="navbar-toggler-icon"></span>
@@ -7,7 +14,7 @@
 
 
     <!--<div class="collapse navbar-collapse" id="navbarNav"> -->
-        <div class="container-fluid">
+    <div class="container-fluid">
 
         <ul class="navbar-nav">
 
@@ -15,27 +22,44 @@
 
             <nav class="navbar navbar-light bg-light">
 
-                <!-- Search Bar-->
-
-                <form class="form-inline my-2 my-lg-0" method="/search" action="POST">
-                    <input class="form-control mr-lg-10" type="search" placeholder="Search..." aria-label="Search" size="75">
+                <!-- Search Bar
+                
+                <input class="form-control mr-lg-10" type="search" placeholder="Search..." aria-label="Search" size="75">
                     <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-                </form>
+                
+                -->
 
+                <form action="/" class="form-inline my-2 my-lg-0" method="get">
+
+                    <div class="form-group">
+
+                        <select class="form-control" name="category" id="category" style="width: 40em;">
+                      <option>Search By Category</option>    
+                      <option>Fashion-Men</option>
+                      <option>Fashion-Women</option>
+                      <option>Fashion-Children</option>
+                      <option>Beauty-SkinCare</option>
+                      <option>Beauty-HairCare</option>
+                      <option>Beauty-Cosmetics</option>
+                      <option>Electronics-Computers & Tablets</option>
+                      <option>Electronics-TV & Audio</option>
+                      <option>Cell phones & Accessories</option>
+                    </select>
+
+                        <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Search</button>
+                    </div>
+
+                </form>
 
             </nav>
 
-            <!-- Contact Us-->
-
-            <li class="nav-item <%= nav == 'contact' ? 'active' : ''%>">
-                <a class="nav-link" href="/contact">Contact Us</a>
-            </li>
         </ul>
         <ul class="navbar-nav navbar-right">
             <% if (!fb.auth().currentUser) { %>
                 <li class="login">
                     <a class="btn btn-primary" href="/login" role="button">Login</a>
                 </li>
+                </br>
                 <% } else { %>
                     <li class="dropdown">
                         <div class="dropdown">
@@ -50,13 +74,13 @@
                         </div>
                     </li>
                     <% } %>
-                <li class = "cart">
-                    <a class="btn btn-outline-success" href="/cart" role="button">view cart</a>
-                </li>
+                        <li class="cart">
+                            <a class="btn btn-outline-primary" href="/cart" role="button">view cart</a>
+                        </li>
         </ul>
 
     </div>
-<!--</div> -->
+    <!--</div> -->
 
 </nav>
 
