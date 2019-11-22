@@ -21,10 +21,6 @@ h3 {
     color: #8B4513;
 }
 
-.column-2 {
-
-}
-
 .row-config {
     display: flex;
     overflow-x: scroll;
@@ -33,17 +29,72 @@ h3 {
 
 .each-card {
     padding: 5px;
-    
 }
 
 .img-config {
     height: 200px;
 }
 
-
 .desc-limit {
     display: block;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+}
+
+.container-fluid {
+    padding: 1em 2em 2em 3em;
+}
+
+
+/*==============================================================================
+            CATEGORIES
+================================================================================*/
+
+.vertical-menu {
+    background-color: white;
+    width: 60em;
+    height: 30em;
+    margin: 0;
+    padding: 0;
+    font-size: medium;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-weight: bold;
+}
+
+.vertical-menu ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.vertical-menu li a {
+    display: block;
+    color: d18c54c9;
+    padding: 8px 16px;
+    text-decoration: none;
+}
+
+.vertical-menu li a.active {
+    background-color: #d0def5;
+    color: #8B4513;
+}
+
+.vertical-menu li a:hover:not(.active) {
+    background-color: #d0def5;
+    color: #8B4513;
+}
+
+
+/*----------------------------------------------------------------------------------------------------
+            FOOTER
+------------------------------------------------------------------------------------------------------*/
+
+footer {
+    background-color: #d0def5;
+    font-size: 16px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-style: italic;
+    text-align: center;
+    padding: 10px;
 }
