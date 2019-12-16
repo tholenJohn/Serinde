@@ -1141,7 +1141,7 @@ app.post('/admindeleteproduct', adminAuth, (req, res) => {
             productsCollection.where("SellerId", "==", sellerid).get().then(productsFound => {
                 res.render('adminproducts', { products: productsFound, fb: firebase, sellerid, selleremail })
             })
-        } else if (sender == "storefront") {
+        } else {
             res.redirect('/')
         }
 
