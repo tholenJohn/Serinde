@@ -1,3 +1,7 @@
 .li:last-child {
     float: right;
 }
+
+#loginButton {
+    margin-right: 2rem;
+}
