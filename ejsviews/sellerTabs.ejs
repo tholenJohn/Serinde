@@ -15,16 +15,23 @@
                               <h2>My Products List: </h2>
                               <hr>
                               <!-- DISPLAY EACH ITEM IN A CARD -->
-                              <%products.forEach(product => {  %>
-                              <div class="card" style="width: 28rem; margin: 2rem auto; border: 2px solid">
-                                  <img src="<%=product.data().ProductUrl %>" height="100" width="100%" class="card-img-top" alt="<%= product.data().ProductTitle %>">
-                                  <div class="card-body">
-                                    <h2 class="card-title"><%= product.data().ProductTitle %></h5>
-                                    <h4 class="card-subtitle mb-2 text-muted"><%= utils.dollar.format(product.data().ProductPrice) %></h6>
-                                    <p class="card-text"><%= product.data().ProductDescription %></p>
+                              
+                              <div class="cards" style="display: grid; 
+                                                        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                                                        grid-auto-rows: auto;
+                                                        grid-gap: 1rem;">
+                                  <%products.forEach(product => {  %>
+                                  <div class="card" style="width: 28rem; margin: 1rem auto;">
+                                    <img src="<%=product.data().ProductUrl %>" height="100" width="100%" class="card-img-top" alt="<%= product.data().ProductTitle %>">
+                                    <div class="card-body">
+                                      <h2 class="card-title"><%= product.data().ProductTitle %></h5>
+                                      <h4 class="card-subtitle mb-2 text-muted"><%= utils.dollar.format(product.data().ProductPrice) %></h6>
+                                      <p class="card-text"><%= product.data().ProductDescription %></p>
+                                    </div>
                                   </div>
-                                </div>
-                                <% }) %> 
+                                  <% }) %>
+                              </div>
+                                 
                                 <!--  -->
                             </div><!-- END OF DASHBOARD -->
 
@@ -98,36 +105,35 @@
                                             <td>
                                               <!-- Button trigger modal -->
                                               <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#exampleModal">REMOVE</button>
-
-<!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Delete confirmation</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        Are you sure you want to remove <%= product.data().ProductTitle %>?
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <form action="/sellerprofile/productdelete" method="POST">
-          <input type="hidden" name="id" value="<%= product.id %>">  
-          <button type="submit" class="btn btn-danger">REMOVE</button>            
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
+                                              <!-- Modal -->
+                                              <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                  <div class="modal-header">
+                                                    <h5 class="modal-title" id="exampleModalLabel">Delete confirmation</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                      <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                  </div>
+                                                  <div class="modal-body">
+                                                    Are you sure you want to remove <%= product.data().ProductTitle %>?
+                                                  </div>
+                                                  <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                    <form action="/sellerprofile/productdelete" method="POST">
+                                                      <input type="hidden" name="id" value="<%= product.id %>">  
+                                                      <button type="submit" class="btn btn-danger">REMOVE</button>            
+                                                    </form>
+                                                  </div>
+                                                </div>
+                                                </div>
+                                              </div>
                                             </td>
-                                        </tr>
+                                          </tr>
                                         <% }) %>
-                                    </tbody>
+                                      </tbody>
                                     </table>
                                   </div>
+                                </div>
+                              <div role="tabpanel" class="tab-pane" id="storestats"><p>Store Statistics</p></div>
                             </div>
-                            <div role="tabpanel" class="tab-pane" id="storestats"><p>Store Statistics</p></div>
-                        </div>
