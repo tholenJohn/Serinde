@@ -11,6 +11,7 @@ const pa = require('path')
 const nodemailer = require('nodemailer')
 const session = require('express-session')
 const fs = require('fs')
+const brain = require('brain.js')
 const utils = require('./utils.js')
 var { Storage } = require('@google-cloud/storage')
 const storage = new Storage({
@@ -19,6 +20,7 @@ const storage = new Storage({
 });
 
 const ShoppingCart = require('./models/ShoppingCart.js');
+const Training = require('./training.js')
 
 // Firebase initialization
 const serviceAccount = require("./serinde-dae45-firebase-adminsdk-z0zyl-2c11c31be9.json")
@@ -683,9 +685,9 @@ app.post('/charge', (req, res) => {
                 means.push(totals[totals.length - 1]/price.length);
                 price.sort();
                 range_price.push(price[price.length-1] - price[0]);
-                normalizedprice.push(Math.abs((means[means.length - 1]
-                    - currentProductPrice[iter])
-                    /range_price[range_price.length-1]));
+                normalizedprice.push((currentProductPrice[iter]
+                    - price[0])
+                    /range_price[range_price.length-1]);
                 price = [];
             }
             iter++;
@@ -695,6 +697,7 @@ app.post('/charge', (req, res) => {
             var calcMid = 0;
             var calcLow = 0;
             for(var i = 0; i < ids.length; i++) {
+                
                 if(normalizedprice[i] > 0.66) {
                     calcHigh = 1;
                     calcLow = calcMid = 0;
@@ -794,30 +797,97 @@ app.post('/charge', (req, res) => {
 //----------------------------------
 
 app.get('/', (_req, res) => {
+    // arrays to display products of each category
     var products = []
     var categories = []
     var uniqueCategories = []
 
-    //if(firebase.auth().currentUser) {console.log(firebase.auth().currentUser.email) }
+    // arrays to use for recommendation engine
+    var tempProducts = []
+    var recommendedRange
 
-    productsCollection.get()
-        .then(productSnap => {
-            productSnap.forEach(singleProduct => {
-                    //store categories and products
 
-                    if (_req.query.cat_id != undefined) {
-                        if (_req.query.cat_id == singleProduct.data().ProductCategory) {
-                            categories.push(singleProduct.data().ProductCategory)
-                            products.push(singleProduct)
-                        }
-                    } else {
-                        categories.push(singleProduct.data().ProductCategory)
-                        products.push(singleProduct)
-                    }
-                })
+    // Recommendation engine
+    let train = new Training()
+
+    // get user's purchases and push them into 4 arrays
+    if(firebase.auth().currentUser) {
+        users.doc(firebase.auth().currentUser.email).collection('bought').get()
+            .then(purchaseSnap => {
+                if(purchaseSnap != undefined) {
+                    purchaseSnap.forEach(purchase => {
+                        // add the category and range values to training set and get recommended range
+                        train.addItems(purchase.data().ProductCategory)
+                        train.addRange(purchase.data().high, purchase.data().low, purchase.data().mid)
+                        recommendedRange = train.getRange(_req.query.cat_id)
+                    })
+                }
+            }).then(
+                productsCollection.get()
+                    .then(productSnap => {
+                        productSnap.forEach(singleProduct => {
+                                //store categories and products
+                                if (_req.query.cat_id != undefined) {
+                                    if (_req.query.cat_id == singleProduct.data().ProductCategory) {
+                                        categories.push(singleProduct.data().ProductCategory)
+                                        tempProducts.push(singleProduct)
+                                    }
+                                } else {
+                                    categories.push(singleProduct.data().ProductCategory)
+                                    products.push(singleProduct)
+                                }
+                            })
                 //filter by unique categories
                 uniqueCategories = Array.from(new Set(categories))
                 //console.log(uniqueCategories)
+
+            
+            // assign products based on the result of recommendation engine
+            if (_req.query.cat_id != undefined) {
+                console.log(recommendedRange)
+ 
+                if (recommendedRange === 'low') {
+                    // sort array of products in ascending order when low value is preferred
+                    tempProducts.sort((a,b) => parseFloat(a.data().ProductPrice) - parseFloat(b.data().ProductPrice))
+                    products = [...tempProducts]
+                } else if (recommendedRange === 'high') {
+                    // sort array of products in descending order when high value is preferred
+                    tempProducts.sort((a,b) => parseFloat(b.data().ProductPrice) - parseFloat(a.data().ProductPrice))
+                    products = [...tempProducts]
+                } else if (recommendedRange === 'mid') {
+
+                    var within = []
+
+                    // filter all prices of items in this category
+                    var allPrices = tempProducts.map(tempProduct => parseFloat(tempProduct.data().ProductPrice))
+                    var allSorted = allPrices.sort()
+                    
+                    var mini = allSorted[0]
+                    var maxi = allSorted[allSorted.length - 1]
+                    var divisor = maxi - mini
+
+
+                    // filter within range to get array of items and push into products
+                    for (let i = 0; i < tempProducts.length; i++) {
+                        if( (tempProducts[i].data().ProductPrice - mini)/divisor > 0.33 && (tempProducts[i].data().ProductPrice - mini)/divisor <= 0.66) {
+                            within.push(tempProducts[i])
+                            tempProducts.splice(i, 1)
+                            i = 0
+                        } 
+                    }
+                    products = [...within]
+
+                    for (let i = 0; i < tempProducts.length; i++) {
+                        products.push(tempProducts[i])
+                    }
+
+                } else {
+                    products = [...tempProducts]
+                }
+                
+            }
+
+
 
             if (firebase.auth().currentUser) { // rendering different homepage for admins
                 if (isAdmin(firebase.auth().currentUser.email)) {
@@ -842,6 +912,56 @@ app.get('/', (_req, res) => {
             console.log('????')
             res.render('errorpage', { message: error.message })
         })
+            ) 
+    } else {
+        //for unregistered users don't train anything, just show items as normal
+        productsCollection.get()
+        .then(productSnap => {
+            productSnap.forEach(singleProduct => {
+                    //store categories and products
+
+                    if (_req.query.cat_id != undefined) {
+                        if (_req.query.cat_id == singleProduct.data().ProductCategory) {
+                            categories.push(singleProduct.data().ProductCategory)
+                            products.push(singleProduct)
+                        }
+                    } else {
+                        categories.push(singleProduct.data().ProductCategory)
+                        products.push(singleProduct)
+                    }
+                })
+                //filter by unique categories
+                uniqueCategories = Array.from(new Set(categories))
+                //console.log(uniqueCategories)
+
+            if (firebase.auth().currentUser) { // rendering different homepage for admins
+                if (isAdmin(firebase.auth().currentUser.email)) {
+                    return res.render('adminstorefront', {
+                        nav: 'adminstorefront',
+                        fb: firebase,
+                        products,
+                        uniqueCategories,
+                        images: storage.bucket('gs://serinde-dae45.appspot.com')
+                    });
+                }
+            }
+            res.render('storefront', {
+                nav: 'storefront',
+                fb: firebase,
+                products,
+                uniqueCategories,
+                images: storage.bucket('gs://serinde-dae45.appspot.com')
+            });
+
+        })
+        .catch(error => {
+            console.log('????')
+            res.render('errorpage', { message: error.message })
+        })
+    }
+
+
+    
 
 })
 
@@ -1021,7 +1141,7 @@ app.post('/admindeleteproduct', adminAuth, (req, res) => {
             productsCollection.where("SellerId", "==", sellerid).get().then(productsFound => {
                 res.render('adminproducts', { products: productsFound, fb: firebase, sellerid, selleremail })
             })
-        } else if (sender == "storefront") {
+        } else {
             res.redirect('/')
         }
 

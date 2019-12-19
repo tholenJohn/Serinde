@@ -2,86 +2,61 @@
 
 
 <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #d0def5">
-
-
-    <!--
-<nav class="navbar-default" style="background-color: red">
--->
-
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-					  <span class="navbar-toggler-icon"></span>
-                    </button>
-
-
-    <!--<div class="collapse navbar-collapse" id="navbarNav"> -->
-    <div class="container-fluid">
-
-        <ul class="navbar-nav">
-
+    <!-- <div class="container-fluid"> -->
+        <!-- <ul class="navbar-nav"> -->
             <a class="navbar-brand" href="/">Serinde</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span> 
+                </button>
 
-            <nav class="navbar navbar-light bg-light">
-
-                <!-- Search Bar
-                
-                <input class="form-control mr-lg-10" type="search" placeholder="Search..." aria-label="Search" size="75">
-                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-                
-                -->
-
+            <!-- <nav class="navbar navbar-light bg-light"> -->
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav mr-auto">
+                        <li class="cart nav-item">
+                                <a class="btn btn-outline-primary" href="/cart" role="button">view cart</a>
+                        </li>
+                        <li class="nav-item">
+                            <ul class="navbar-nav navbar-right">
+                                <% if (!fb.auth().currentUser) { %>
+                                    <li class="login">
+                                        <a class="btn btn-primary" href="/login" role="button">Login</a>
+                                    </li>
+                                    </br>
+                                <% } else { %>
+                                    <li class="dropdown">
+                                        <div class="dropdown">
+                                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                <%= fb.auth().currentUser.email %>  
+                                                </button>
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                <a class="dropdown-item" href="/userprofile">User Profile</a>
+                                                <a class="dropdown-item" href="/sellerprofile">Selling information</a>
+                                                <a class="dropdown-item" href="/logout">Log out</a>
+                                            </div>
+                                        </div>
+                                    </li>
+                                <% } %>           
+                            </ul>
+                        </li>
+                    </ul>
                 <form action="/" class="form-inline my-2 my-lg-0" method="get">
-
-                    <div class="form-group">
-
-                        <select class="form-control" name="category" id="category" style="width: 40em;">
-                      <option>Search By Category</option>    
-                      <option>Fashion-Men</option>
-                      <option>Fashion-Women</option>
-                      <option>Fashion-Children</option>
-                      <option>Beauty-SkinCare</option>
-                      <option>Beauty-HairCare</option>
-                      <option>Beauty-Cosmetics</option>
-                      <option>Electronics-Computers & Tablets</option>
-                      <option>Electronics-TV & Audio</option>
-                      <option>Cell phones & Accessories</option>
-                    </select>
-
+                    <div class="form-group mr-sm-2">
+                        <select class="form-control mr-sm-2" name="cat_id" id="cat_id" style="width: 40em;">
+                            <option>Search By Category</option>    
+                            <option>Fashion-Men</option>
+                            <option>Fashion-Women</option>
+                            <option>Fashion-Children</option>
+                            <option>Beauty-SkinCare</option>
+                            <option>Beauty-HairCare</option>
+                            <option>Beauty-Cosmetics</option>
+                            <option>Electronics-Computers & Tablets</option>
+                            <option>Electronics-TV & Audio</option>
+                            <option>Cell phones & Accessories</option>
+                        </select>
                         <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Search</button>
                     </div>
-
                 </form>
-
-            </nav>
-
-        </ul>
-        <ul class="navbar-nav navbar-right">
-            <% if (!fb.auth().currentUser) { %>
-                <li class="login">
-                    <a class="btn btn-primary" href="/login" role="button">Login</a>
-                </li>
-                </br>
-                <% } else { %>
-                    <li class="dropdown">
-                        <div class="dropdown">
-                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-								<%= fb.auth().currentUser.email %>  
-								</button>
-                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <a class="dropdown-item" href="/userprofile">User Profile</a>
-                                <a class="dropdown-item" href="/sellerprofile">Selling information</a>
-                                <a class="dropdown-item" href="/logout">Log out</a>
-                            </div>
-                        </div>
-                    </li>
-                    <% } %>
-                        <li class="cart">
-                            <a class="btn btn-outline-primary" href="/cart" role="button">view cart</a>
-                        </li>
-        </ul>
-
     </div>
-    <!--</div> -->
-
 </nav>
 
 
