@@ -1,2 +1,2 @@
 # Serinde
-Back-End for capstone project at UCO
+Capstone project at UCO
