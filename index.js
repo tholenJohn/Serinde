@@ -1267,3 +1267,4 @@ app.get('/search', (_req, res) => {
         })
 
 })
+exports.app = functions.https.onRequest(app);
