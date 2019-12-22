@@ -857,7 +857,6 @@ app.get('/', (_req, res) => {
                 } else if (recommendedRange === 'mid') {
 
                     var within = []
-                    var outside = []
 
                     // filter all prices of items in this category
                     var allPrices = tempProducts.map(tempProduct => parseFloat(tempProduct.data().ProductPrice))
